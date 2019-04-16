@@ -84,7 +84,7 @@ hr {
 }
 .loan-container {
   width: 100%;
-  max-width: 40em;
+  max-width: 55em;
   margin: 1.2em auto;
   padding: 0 1.5em;
 }
@@ -117,7 +117,7 @@ hr {
   display: flex;
   margin-left: 1em;
 }
-.loan-amount, .loan-installment {
+.loan-amount, .loan-installment, .loan-history-balance {
   flex-basis: 50%
 }
 .text {
@@ -127,7 +127,7 @@ hr {
 .loan-amount, .loan-installment, .loan-balance {
   margin-bottom: 0.6em;
 }
-.loan-amount__number, .loan-balance__number {
+.loan-amount__number, .loan-balance__number, .loan-repaid__number {
   font-size: 2em;
 }
 .loan-balance__number {
@@ -215,7 +215,7 @@ input {
   .loan-date__year {
     margin-left: 1em;
   }
-  .loan-amount__number, .loan-balance__number {
+  .loan-amount__number, .loan-balance__number, .loan-repaid__number {
     font-size: 1.5em;
   }
 
