@@ -59,6 +59,10 @@ hr {
   margin-bottom: 1.5em;
   color: white;
 }
+.loan-link.current {
+  padding-bottom: 2px;
+  border-bottom: 4px solid rgb(255, 255, 0)
+}
 .main-panel {
   flex-basis: 75%;
 }
