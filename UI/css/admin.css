@@ -63,6 +63,10 @@ hr {
   padding-bottom: 2px;
   border-bottom: 4px solid rgb(255, 255, 0)
 }
+.loan-link.repaid {
+  padding-bottom: 3px;
+  border-bottom: 4px solid rgb(115, 255, 0)
+}
 .main-panel {
   flex-basis: 75%;
 }
