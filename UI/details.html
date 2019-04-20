@@ -10,72 +10,75 @@
   <title>Details</title>
 </head>
 <body>
-  <nav>
-    <div class="nav-toggle"><a href="#"><img src="./img/icon-menu.svg"></a></div>
-    <h2 class="nav-heading">Quick-Credit</h2>
-    <div class="nav-item">
-      <a href="admin.html">Dashboard</a>
+  <div class="top-container">
+    <nav>
+      <div class="nav-toggle"><a href="#"><img src="./img/icon-menu.svg"></a></div>
+      <h2 class="nav-heading">Quick-Credit</h2>
+      <div class="nav-item">
+        <a href="admin.html">Dashboard</a>
+        <a href="#">Logout</a>
+      </div>
+    </nav>
+    <div class="top-nav">
+      <a href="#">Dashboard</a>
       <a href="#">Logout</a>
     </div>
-  </nav>
-  <div class="top-nav">
-    <a href="#">Dashboard</a>
-    <a href="#">Logout</a> 
-  </div>
-
-  <h3 class="heading">Loan Details</h3>
-  <div class="container">
-    <div class="details-wrapper">
-      <p class="username">Frimpong Sylvester</p>
-      <div class="details-row">
-        <p class="details-name">Loan Amount</p>
-        <p class="details-value">$5908.00</p>
+    
+    <h3 class="heading">Loan Details</h3>
+    <div class="container">
+      <div class="details-wrapper">
+        <p class="username">Frimpong Sylvester</p>
+        <div class="details-row">
+          <p class="details-name">Loan Amount</p>
+          <p class="details-value">$5908.00</p>
+        </div>
+        <div class="details-row">
+          <p class="details-name">Duration</p>
+          <p class="details-value">5 months</p>
+        </div>
+        <div class="details-row">
+          <p class="details-name">Installment</p>
+          <p class="details-value">$5908.00</p>
+        </div>
+        <div class="details-row">
+          <p class="details-name">Interest</p>
+          <p class="details-value">$5908.00</p>
+        </div>
+        <div class="details-row">
+          <p class="details-name">Status</p>
+          <p class="details-value">pending</p>
+        </div>
+        <div class="details-row">
+          <p class="details-name">Balance</p>
+          <p class="details-value balance">$5908.00</p>
+        </div>
+        <div class="details-row">
+          <p class="details-name">Repaid</p>
+          <p class="details-value">NO</p>
+        </div>
+        <div class="btn-group">
+          <button class="btn-approve">Approve</button>
+          <button class="btn-reject">Reject</button>
+          <button class="btn-repay"><a href="#">Repay</a></button>
+        </div>
+    
       </div>
-      <div class="details-row">
-        <p class="details-name">Duration</p>
-        <p class="details-value">5 months</p>
+    </div>
+    
+    <div class="repay-modal">
+      <span class="close">&times;</span>
+      <div class="repay-modal__content">
+        <form>
+          <label>Client</label>
+          <p class="repay-modal__name">Frimpong Sylvester</p>
+          <label for="repay-amount">Amount</label>
+          <input type="number" id="repay-amount">
+          <button class="pay-btn">Pay</button>
+        </form>
       </div>
-      <div class="details-row">
-        <p class="details-name">Installment</p>
-        <p class="details-value">$5908.00</p>
-      </div>
-      <div class="details-row">
-        <p class="details-name">Interest</p>
-        <p class="details-value">$5908.00</p>
-      </div>
-      <div class="details-row">
-        <p class="details-name">Status</p>
-        <p class="details-value">pending</p>
-      </div>
-      <div class="details-row">
-        <p class="details-name">Balance</p>
-        <p class="details-value balance">$5908.00</p>
-      </div>
-      <div class="details-row">
-        <p class="details-name">Repaid</p>
-        <p class="details-value">NO</p>
-      </div>
-      <div class="btn-group">
-        <button class="btn-approve">Approve</button>
-        <button class="btn-reject">Reject</button>
-        <button class="btn-repay"><a href="#">Repay</a></button>
-      </div>
-      
     </div>
   </div>
-
-  <div class="repay-modal">
-    <span class="close">&times;</span>
-    <div class="repay-modal__content">
-      <form>
-        <label>Client</label>
-        <p class="repay-modal__name">Frimpong Sylvester</p>
-        <label for="repay-amount">Amount</label>
-        <input type="number" id="repay-amount">
-        <button class="pay-btn">Pay</button>
-      </form>
-    </div>
-  </div>
+  
   <script src="./js/details.js"></script>
 </body>
 </html>
