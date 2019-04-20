@@ -8,43 +8,47 @@
   <title>Quick-Credit</title>
 </head>
 <body>
-  <div class="wrapper">
+  <div class="top-container">
     <nav>
-      <h3 class="nav-brand">Quick-Credit</h3>
+      <div class="nav-toggle"><a href="#"><img src="./img/icon-menu.svg"></a></div>
+      <h2 class="nav-heading">Quick-Credit</h2>
       <div class="nav-item">
-        <a href="#" class="nav-link">Login</a>
-        <a href="#" class="nav-link">Sign Up</a>
+        <a href="login.html">Login</a>
+        <a href="signup.html">Sign Up</a>
       </div>
     </nav>
-    
-    <div class="signup-container">
+    <div class="top-nav">
+      <a href="login.html">Login</a>
+      <a href="signup.html">Sign Up</a>
+    </div>
+    <div class="wrapper">
+      <div class="signup-container">
         <h3 class="heading">SIGN UP</h3>
         <div class="form-wrapper">
           <form>
             <label for="first-name">First Name</label>
             <input type="text" id="first-name" placeholder="Ciroma" required>
-          
+    
             <label for="last-name">Last Name</label>
             <input type="text" id="last-name" placeholder="Adekunle" required>
-          
+    
             <label for="email">Email</label>
-            <input type="text" id="email" placeholder="example@gmail.com" required>
-          
+            <input type="email" id="email" placeholder="example@gmail.com" required>
+    
             <label for="address">Address</label>
             <input type="text" id="address" placeholder="35 Broad Street, Ijegun Lagos." required>
-          
+    
             <label for="password">Password</label>
             <input type="password" id="password" placeholder="**********" required>
-          
-            <button class="signup-btn">Sign Up</button>
+    
+            <button class="form-btn">Sign Up</button>
           </form>
           <p>Already have an account? <a href="login.html">Login</a></p>
         </div>
-        
       </div>
+    </div>
   </div>
-    
- 
- 
+  
+<script src="./js/details.js"></script>
 </body>
 </html>
