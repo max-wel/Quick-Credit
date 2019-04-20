@@ -15,7 +15,7 @@ nav {
   justify-content: space-between;
   align-items: baseline;
   padding: 1.6em 3.5em;
-  box-shadow: 0 0 5px rgb(173, 172, 172);
+  box-shadow: 0 4px 5px -5px rgb(173, 172, 172);
   background-color: white;
 }
 .nav-item a {
@@ -195,6 +195,7 @@ input {
     height: 25%;
     width: 100%;
     background-color: #333;
+    padding-top: 1em;
   }
   .top-nav a {
     color: white;
