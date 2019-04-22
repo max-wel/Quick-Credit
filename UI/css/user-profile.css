@@ -2,7 +2,7 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: 'Roboto Mono', sans-serif;
+  font-family: Montserrat, sans-serif;
   color: #333;
 }
 body {
@@ -15,6 +15,9 @@ nav {
   align-items: baseline;
   padding: 1.6em 4em;
   box-shadow: 0 4px 5px -5px rgb(173, 172, 172);
+}
+.nav-heading a{
+  text-decoration: none;
 }
 .nav-toggle {
  display: none;
@@ -95,6 +98,7 @@ hr {
 .loan-wrapper {
   display: flex;
   box-shadow: 0 0 3px rgb(163, 161, 161);
+  margin-bottom: 1em;
 }
 .loan-date {
   display: flex;

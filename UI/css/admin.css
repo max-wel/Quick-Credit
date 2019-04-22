@@ -17,6 +17,9 @@ nav {
   padding: 1.6em 4em;
   box-shadow: 0 4px 5px -5px rgb(173, 172, 172);
 }
+.nav-heading a{
+  text-decoration: none;
+}
 .nav-toggle {
  display: none;
 }

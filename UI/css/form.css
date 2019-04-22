@@ -17,6 +17,9 @@ nav {
   box-shadow: 0 4px 5px -5px rgb(173, 172, 172);
   background-color: white;
 }
+.nav-heading a{
+  text-decoration: none;
+}
 .nav-item a {
   text-decoration: none;
   padding: 0 1em;
