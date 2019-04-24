@@ -4,7 +4,7 @@ const loans = [
     user: 'sneaky@gmail.com',
     createdOn: new Date(),
     status: 'pending',
-    repaid: false,
+    repaid: true,
     tenor: 4,
     amount: 1200.00,
     paymentInstallment: 315.00,
@@ -34,6 +34,18 @@ const loans = [
     paymentInstallment: 262.50,
     balance: 1260,
     interest: 100.00,
+  },
+  {
+    id: 4,
+    user: 'sneaky@gmail.com',
+    createdOn: new Date(),
+    status: 'pending',
+    repaid: true,
+    tenor: 4,
+    amount: 1200.00,
+    paymentInstallment: 315.00,
+    balance: 1260.00,
+    interest: 60.00,
   },
 ];
 export default loans;

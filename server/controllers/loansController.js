@@ -20,8 +20,18 @@ const createLoan = (req, res) => {
     interest,
   };
 
+  const existingLoans = Loans.filter(loan => loan.user === user);
+
+  const repaidLoan = existingLoans.filter(loan => loan.repaid === false);
+  if (repaidLoan.length !== 0) {
+    return res.status(400).json({
+      status: 400,
+      error: 'Unsettle',
+    });
+  }
+
   Loans.push(newLoan);
-  res.status(201).json({
+  return res.status(201).json({
     status: 201,
     data: newLoan,
   });
