@@ -37,6 +37,21 @@ describe('POST create loan application', () => {
       })
       .end((err, res) => {
         expect(res.status).to.equal(201);
+        expect(res.body).to.have.property('data');
+        done();
+      });
+  });
+  it('should return an error if user tries to request for more than one loan', (done) => {
+    request(app)
+      .post('/api/v1/loans')
+      .send({
+        user: 'santorini@gmail.com',
+        tenor: '5',
+        amount: '1500.00',
+      })
+      .end((err, res) => {
+        expect(res.status).to.equal(400);
+        expect(res.body).to.have.property('error');
         done();
       });
   });
@@ -51,6 +66,7 @@ describe('POST create loan application', () => {
       })
       .end((err, res) => {
         expect(res.status).to.equal(400);
+        expect(res.body).to.have.property('error');
         done();
       });
   });
@@ -64,6 +80,7 @@ describe('POST create loan application', () => {
       })
       .end((err, res) => {
         expect(res.status).to.equal(400);
+        expect(res.body).to.have.property('error');
         done();
       });
   });
@@ -77,6 +94,7 @@ describe('POST create loan application', () => {
       })
       .end((err, res) => {
         expect(res.status).to.equal(400);
+        expect(res.body).to.have.property('error');
         done();
       });
   });
@@ -90,6 +108,7 @@ describe('POST create loan application', () => {
       })
       .end((err, res) => {
         expect(res.status).to.equal(400);
+        expect(res.body).to.have.property('error');
         done();
       });
   });
