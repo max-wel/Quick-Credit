@@ -112,3 +112,42 @@ describe('POST user signup', () => {
       });
   });
 });
+
+describe('POST user signin', () => {
+  it('should signin user', (done) => {
+    request(app)
+      .post('/api/v1/auth/signin')
+      .send(validUser)
+      .end((err, res) => {
+        expect(res.status).to.equal(200);
+        expect(res.body).to.have.property('data');
+        done();
+      });
+  });
+  it('should return an error when user tries to signin with an invalid email', (done) => {
+    request(app)
+      .post('/api/v1/auth/signin')
+      .send({
+        email: 'invaliduser@gmail.com',
+        password: 'Lyonnais',
+      })
+      .end((err, res) => {
+        expect(res.status).to.equal(400);
+        expect(res.body).to.have.property('error');
+        done();
+      });
+  });
+  it('should return an error when user tries to signin with an invalid password', (done) => {
+    request(app)
+      .post('/api/v1/auth/signin')
+      .send({
+        email: 'memphis@gmail.com',
+        password: 'Lyonnais123',
+      })
+      .end((err, res) => {
+        expect(res.status).to.equal(400);
+        expect(res.body).to.have.property('error');
+        done();
+      });
+  });
+});

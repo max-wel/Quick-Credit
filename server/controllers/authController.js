@@ -44,4 +44,33 @@ const userSignup = (req, res) => {
   });
 };
 
-export default { userSignup };
+const userSignin = (req, res) => {
+  const { email, password } = req.body;
+  const user = Users.find(item => item.email === email);
+  if (!user) {
+    return res.status(400).json({
+      status: 400,
+      error: 'Invalid login credentials',
+    });
+  }
+  if (!passwordEncrypt.comparePassword(password, user.password)) {
+    return res.status(400).json({
+      status: 400,
+      error: 'Invalid login credentials',
+    });
+  }
+  // create token
+  const token = jwt.sign({ userId: user.id }, jwtSecret, { expiresIn: '1h' });
+  return res.json({
+    status: 200,
+    data: {
+      token,
+      id: user.id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+    },
+  });
+};
+
+export default { userSignup, userSignin };
