@@ -29,4 +29,41 @@ const loanValidator = (req, res, next) => {
   }
   return next();
 };
-export default { loanValidator };
+
+const signupValidator = (req, res, next) => {
+  const {
+    email, firstName, lastName, password, address,
+  } = req.body;
+  if (!email || email.trim() === '') {
+    return res.status(400).json({
+      status: 400,
+      error: 'Email is required',
+    });
+  }
+  if (!firstName || firstName.trim() === '') {
+    return res.status(400).json({
+      status: 400,
+      error: 'First name is required',
+    });
+  }
+  if (!lastName || lastName.trim() === '') {
+    return res.status(400).json({
+      status: 400,
+      error: 'Last name is required',
+    });
+  }
+  if (!password || password.trim() === '') {
+    return res.status(400).json({
+      status: 400,
+      error: 'Password is required',
+    });
+  }
+  if (!address || address.trim() === '') {
+    return res.status(400).json({
+      status: 400,
+      error: 'Address is required',
+    });
+  }
+  return next();
+};
+export default { loanValidator, signupValidator };
