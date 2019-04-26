@@ -37,9 +37,20 @@ const createLoan = (req, res) => {
   });
 };
 
-const getAllLoans = (req, res) => res.json({
-  status: 200,
-  data: Loans,
-});
+const getAllLoans = (req, res) => {
+  const { status, repaid } = req.query;
 
+  if (status === 'approved' && repaid === 'false') {
+    const currentLoans = Loans.filter(loan => loan.status === status && !loan.repaid);
+    return res.json({
+      status: 200,
+      data: currentLoans,
+    });
+  }
+
+  return res.json({
+    status: 200,
+    data: Loans,
+  });
+};
 export default { createLoan, getAllLoans };
