@@ -30,7 +30,7 @@ const userSignup = (req, res) => {
   };
   Users.push(newUser);
   // create token
-  const token = jwt.sign({ userId: newUser.id }, jwtSecret, { expiresIn: '1h' });
+  const token = jwt.sign({ id: newUser.id, isAdmin: newUser.isAdmin }, jwtSecret, { expiresIn: '1h' });
 
   return res.status(201).json({
     status: 201,
@@ -60,7 +60,7 @@ const userSignin = (req, res) => {
     });
   }
   // create token
-  const token = jwt.sign({ userId: user.id }, jwtSecret, { expiresIn: '1h' });
+  const token = jwt.sign({ id: user.id, isAdmin: user.isAdmin }, jwtSecret, { expiresIn: '1h' });
   return res.json({
     status: 200,
     data: {

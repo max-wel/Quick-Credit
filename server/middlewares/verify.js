@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 const secret = process.env.JWT_SECRET;
-const verifyLogin = (req, res, next) => {
+const isLoggedIn = (req, res, next) => {
   const token = req.headers['x-access-token'];
   if (!token) {
     return res.status(401).json({
@@ -18,9 +18,20 @@ const verifyLogin = (req, res, next) => {
         error: 'Invalid token',
       });
     }
-    req.userId = decoded.userId;
+    req.user = { id: decoded.id, isAdmin: decoded.isAdmin };
     return next();
   });
 };
 
-export default { verifyLogin };
+const adminOnly = (req, res, next) => {
+  const { isAdmin } = req.user;
+  if (!isAdmin) {
+    return res.status(403).json({
+      status: 403,
+      error: 'Access forbidden, admin only',
+    });
+  }
+  return next();
+};
+
+export default { isLoggedIn, adminOnly };
