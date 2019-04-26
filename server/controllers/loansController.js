@@ -47,6 +47,13 @@ const getAllLoans = (req, res) => {
       data: currentLoans,
     });
   }
+  if (status === 'approved' && repaid === 'true') {
+    const repaidLoans = Loans.filter(loan => loan.status === status && loan.repaid);
+    return res.json({
+      status: 200,
+      data: repaidLoans,
+    });
+  }
 
   return res.json({
     status: 200,

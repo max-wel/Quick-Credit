@@ -47,5 +47,17 @@ const loans = [
     balance: 1575.00,
     interest: 75.00,
   },
+  {
+    id: 5,
+    user: 'nigel@gmail.com',
+    createdOn: new Date(),
+    status: 'approved',
+    repaid: true,
+    tenor: 5,
+    amount: 1500.00,
+    paymentInstallment: 315.00,
+    balance: 1575.00,
+    interest: 75.00,
+  },
 ];
 export default loans;
