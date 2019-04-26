@@ -60,4 +60,20 @@ const getAllLoans = (req, res) => {
     data: Loans,
   });
 };
-export default { createLoan, getAllLoans };
+
+const getSpecificLoan = (req, res) => {
+  const loanId = parseInt(req.params.id, 10);
+  const loan = Loans.find(item => item.id === loanId);
+  if (!loan) {
+    return res.status(404).json({
+      status: 404,
+      error: 'No loan found',
+    });
+  }
+  return res.json({
+    status: 200,
+    data: loan,
+  });
+};
+
+export default { createLoan, getAllLoans, getSpecificLoan };
