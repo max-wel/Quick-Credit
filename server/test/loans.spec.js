@@ -187,4 +187,16 @@ describe('Loan Tests', () => {
         });
     });
   });
+  describe('Admin GET all repaid loans', () => {
+    it('should return all repaid loans', (done) => {
+      request(app)
+        .get('/api/v1/loans/?status=approved&repaid=true')
+        .set('x-access-token', adminToken)
+        .end((err, res) => {
+          expect(res.status).to.equal(200);
+          expect(res.body).to.have.property('data');
+          done();
+        });
+    });
+  });
 });
