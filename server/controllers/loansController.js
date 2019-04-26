@@ -37,4 +37,9 @@ const createLoan = (req, res) => {
   });
 };
 
-export default { createLoan };
+const getAllLoans = (req, res) => res.json({
+  status: 200,
+  data: Loans,
+});
+
+export default { createLoan, getAllLoans };

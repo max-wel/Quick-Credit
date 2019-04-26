@@ -10,6 +10,30 @@ const validUser = {
   address: '21, Bode Thomas street, Amsterdam',
 };
 
+describe('Welcome test', () => {
+  it('should return a welcome message', (done) => {
+    request(app)
+      .get('/api/v1')
+      .end((err, res) => {
+        expect(res.status).to.equal(200);
+        expect(res.body.message).to.equal('Welcome to quick-credit api');
+        done();
+      });
+  });
+});
+
+describe('Invalid routes test', () => {
+  it('should return a 404 error for non-existing routes', (done) => {
+    request(app)
+      .get('/api/v1/andela')
+      .end((err, res) => {
+        expect(res.status).to.equal(404);
+        expect(res.body.error).to.equal('Resource not found');
+        done();
+      });
+  });
+});
+
 describe('POST user signup', () => {
   it('should create a new user', (done) => {
     request(app)
