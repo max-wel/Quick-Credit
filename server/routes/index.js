@@ -13,6 +13,7 @@ router.get('/', (req, res) => {
 });
 router.post('/loans', verify.isLoggedIn, validation.loanValidator, loansController.createLoan);
 router.get('/loans', verify.isLoggedIn, verify.adminOnly, loansController.getAllLoans);
+router.get('/loans/:id', verify.isLoggedIn, verify.adminOnly, loansController.getSpecificLoan);
 
 // auth routes
 router.post('/auth/signup', validation.signupValidator, authController.userSignup);

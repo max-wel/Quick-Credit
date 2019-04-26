@@ -199,4 +199,27 @@ describe('Loan Tests', () => {
         });
     });
   });
+
+  describe('Admin GET specific loan', () => {
+    it('should return a specific loan', (done) => {
+      request(app)
+        .get('/api/v1/loans/1')
+        .set('x-access-token', adminToken)
+        .end((err, res) => {
+          expect(res.status).to.equal(200);
+          expect(res.body).to.have.property('data');
+          done();
+        });
+    });
+    it('should return an error when passed invalid loan-id', (done) => {
+      request(app)
+        .get('/api/v1/loans/20')
+        .set('x-access-token', adminToken)
+        .end((err, res) => {
+          expect(res.status).to.equal(404);
+          expect(res.body).to.have.property('error');
+          done();
+        });
+    });
+  });
 });
