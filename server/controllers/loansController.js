@@ -76,4 +76,24 @@ const getSpecificLoan = (req, res) => {
   });
 };
 
-export default { createLoan, getAllLoans, getSpecificLoan };
+const updateLoan = (req, res) => {
+  const loanId = parseInt(req.params.id, 10);
+  const { status } = req.body;
+
+  const loanIndex = Loans.findIndex(loan => loan.id === loanId);
+  if (loanIndex < 0) {
+    return res.status(400).json({
+      status: 400,
+      error: 'Invalid id parameter',
+    });
+  }
+  Loans[loanIndex].status = status;
+  return res.json({
+    status: 200,
+    data: Loans[loanIndex],
+  });
+};
+
+export default {
+  createLoan, getAllLoans, getSpecificLoan, updateLoan,
+};
