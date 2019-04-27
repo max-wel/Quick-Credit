@@ -66,4 +66,16 @@ const signupValidator = (req, res, next) => {
   }
   return next();
 };
-export default { loanValidator, signupValidator };
+
+const updateLoanValidator = (req, res, next) => {
+  const { status } = req.body;
+
+  if (status === 'approved' || status === 'rejected') {
+    return next();
+  }
+  return res.status(400).json({
+    status: 400,
+    error: 'Invalid status',
+  });
+};
+export default { loanValidator, signupValidator, updateLoanValidator };

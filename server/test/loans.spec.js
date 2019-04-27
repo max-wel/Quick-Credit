@@ -222,4 +222,53 @@ describe('Loan Tests', () => {
         });
     });
   });
+
+  describe('Admin approve/reject loan application', () => {
+    it('should return an approved loan', (done) => {
+      request(app)
+        .patch('/api/v1/loans/1')
+        .set('x-access-token', adminToken)
+        .send({ status: 'approved' })
+        .end((err, res) => {
+          expect(res.status).to.equal(200);
+          expect(res.body).to.have.property('data');
+          expect(res.body.data.status).to.equal('approved');
+          done();
+        });
+    });
+    it('should return a rejected loan', (done) => {
+      request(app)
+        .patch('/api/v1/loans/1')
+        .set('x-access-token', adminToken)
+        .send({ status: 'rejected' })
+        .end((err, res) => {
+          expect(res.status).to.equal(200);
+          expect(res.body).to.have.property('data');
+          expect(res.body.data.status).to.equal('rejected');
+          done();
+        });
+    });
+    it('should return an error when passed invalid loan-id parameter', (done) => {
+      request(app)
+        .patch('/api/v1/loans/90')
+        .set('x-access-token', adminToken)
+        .send({ status: 'approved' })
+        .end((err, res) => {
+          expect(res.status).to.equal(400);
+          expect(res.body).to.have.property('error');
+          done();
+        });
+    });
+    it('should return an error when status is neither approved/rejected', (done) => {
+      request(app)
+        .patch('/api/v1/loans/1')
+        .set('x-access-token', adminToken)
+        .send({ status: 'something-else' })
+        .end((err, res) => {
+          expect(res.status).to.equal(400);
+          expect(res.body).to.have.property('error');
+          done();
+        });
+    });
+  });
 });

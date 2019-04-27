@@ -11,9 +11,13 @@ router.get('/', (req, res) => {
     message: 'Welcome to quick-credit api',
   });
 });
-router.post('/loans', verify.isLoggedIn, validation.loanValidator, loansController.createLoan);
-router.get('/loans', verify.isLoggedIn, verify.adminOnly, loansController.getAllLoans);
-router.get('/loans/:id', verify.isLoggedIn, verify.adminOnly, loansController.getSpecificLoan);
+
+router.route('/loans')
+  .post(verify.isLoggedIn, validation.loanValidator, loansController.createLoan)
+  .get(verify.isLoggedIn, verify.adminOnly, loansController.getAllLoans);
+router.route('/loans/:id')
+  .get(verify.isLoggedIn, verify.adminOnly, loansController.getSpecificLoan)
+  .patch(verify.isLoggedIn, verify.adminOnly, validation.updateLoanValidator, loansController.updateLoan);
 
 // auth routes
 router.post('/auth/signup', validation.signupValidator, authController.userSignup);
