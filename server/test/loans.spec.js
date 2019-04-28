@@ -224,7 +224,7 @@ describe('Loan Tests', () => {
   });
 
   describe('Admin approve/reject loan application', () => {
-    it('should return an approved loan', (done) => {
+    it('should approve a loan application', (done) => {
       request(app)
         .patch('/api/v1/loans/1')
         .set('x-access-token', adminToken)
@@ -236,7 +236,7 @@ describe('Loan Tests', () => {
           done();
         });
     });
-    it('should return a rejected loan', (done) => {
+    it('should reject a loan application', (done) => {
       request(app)
         .patch('/api/v1/loans/1')
         .set('x-access-token', adminToken)
@@ -267,6 +267,68 @@ describe('Loan Tests', () => {
         .end((err, res) => {
           expect(res.status).to.equal(400);
           expect(res.body).to.have.property('error');
+          done();
+        });
+    });
+  });
+
+  describe('Admin POST loan repayment', () => {
+    it('should create a loan repayment', (done) => {
+      request(app)
+        .post('/api/v1/loans/2/repayment')
+        .set('x-access-token', adminToken)
+        .send({ paidAmount: '400.00' })
+        .end((err, res) => {
+          expect(res.status).to.equal(201);
+          expect(res.body).to.have.property('data');
+          done();
+        });
+    });
+    it('should return an error when passed invalid loan-id parameter', (done) => {
+      request(app)
+        .post('/api/v1/loans/90/repayment')
+        .set('x-access-token', adminToken)
+        .send({ paidAmount: '400.00' })
+        .end((err, res) => {
+          expect(res.status).to.equal(400);
+          expect(res.body).to.have.property('error');
+          expect(res.body.error).to.equal('Invalid id parameter');
+          done();
+        });
+    });
+    it('should return an error if loan is not approved', (done) => {
+      request(app)
+        .post('/api/v1/loans/1/repayment')
+        .set('x-access-token', adminToken)
+        .send({ paidAmount: '400.00' })
+        .end((err, res) => {
+          expect(res.status).to.equal(400);
+          expect(res.body).to.have.property('error');
+          expect(res.body.error).to.equal('Loan is not approved');
+          done();
+        });
+    });
+    it('should return an error if loan has been repaid', (done) => {
+      request(app)
+        .post('/api/v1/loans/5/repayment')
+        .set('x-access-token', adminToken)
+        .send({ paidAmount: '400.00' })
+        .end((err, res) => {
+          expect(res.status).to.equal(400);
+          expect(res.body).to.have.property('error');
+          expect(res.body.error).to.equal('Loan already repaid');
+          done();
+        });
+    });
+    it('should return an error when passed an invalid repay amount', (done) => {
+      request(app)
+        .post('/api/v1/loans/2/repayment')
+        .set('x-access-token', adminToken)
+        .send({ paidAmount: '400A.00' })
+        .end((err, res) => {
+          expect(res.status).to.equal(400);
+          expect(res.body).to.have.property('error');
+          expect(res.body.error).to.equal('Invalid amount');
           done();
         });
     });

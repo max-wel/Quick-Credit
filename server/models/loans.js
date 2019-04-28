@@ -56,7 +56,7 @@ const loans = [
     tenor: 5,
     amount: 1500.00,
     paymentInstallment: 315.00,
-    balance: 1575.00,
+    balance: 0.00,
     interest: 75.00,
   },
 ];

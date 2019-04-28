@@ -1,4 +1,5 @@
 import Loans from '../models/loans';
+import Repayments from '../models/repayments';
 
 const createLoan = (req, res) => {
   const { user } = req.body;
@@ -94,6 +95,58 @@ const updateLoan = (req, res) => {
   });
 };
 
+const repayLoan = (req, res) => {
+  const loanId = parseInt(req.params.id, 10);
+  const paidAmount = Number(req.body.paidAmount);
+
+  const loanIndex = Loans.findIndex(loan => loan.id === loanId);
+  if (loanIndex < 0) {
+    return res.status(400).json({
+      status: 400,
+      error: 'Invalid id parameter',
+    });
+  }
+  const loan = Loans[loanIndex];
+  // check if loan has been approved
+  if (loan.status !== 'approved') {
+    return res.status(400).json({
+      status: 400,
+      error: 'Loan is not approved',
+    });
+  }
+  // check if loan has been repaid
+  if (loan.repaid) {
+    return res.status(400).json({
+      status: 400,
+      error: 'Loan already repaid',
+    });
+  }
+  // compute new balance
+  const newBalance = Number((loan.balance - paidAmount).toFixed(2));
+  loan.balance = newBalance;
+  if (newBalance === 0) {
+    loan.repaid = true;
+  }
+  // create repayment record
+  const repayment = {
+    id: Repayments.length + 1,
+    loanId,
+    createdOn: new Date(),
+    paidAmount,
+  };
+  Repayments.push(repayment);
+
+  return res.status(201).json({
+    status: 201,
+    data: {
+      ...repayment,
+      amount: loan.amount,
+      monthlyInstallment: loan.paymentInstallment,
+      balance: loan.balance,
+    },
+  });
+};
+
 export default {
-  createLoan, getAllLoans, getSpecificLoan, updateLoan,
+  createLoan, getAllLoans, getSpecificLoan, updateLoan, repayLoan,
 };
