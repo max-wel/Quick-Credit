@@ -69,7 +69,6 @@ const signupValidator = (req, res, next) => {
 
 const updateLoanValidator = (req, res, next) => {
   const { status } = req.body;
-
   if (status === 'approved' || status === 'rejected') {
     return next();
   }
@@ -78,4 +77,18 @@ const updateLoanValidator = (req, res, next) => {
     error: 'Invalid status',
   });
 };
-export default { loanValidator, signupValidator, updateLoanValidator };
+
+const repayLoanValidator = (req, res, next) => {
+  const { paidAmount } = req.body;
+  const regex = /^\d+\.\d{2}$/;
+  if (!regex.test(paidAmount)) {
+    return res.status(400).json({
+      status: 400,
+      error: 'Invalid amount',
+    });
+  }
+  return next();
+};
+export default {
+  loanValidator, signupValidator, updateLoanValidator, repayLoanValidator,
+};
