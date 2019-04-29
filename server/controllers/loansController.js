@@ -77,21 +77,22 @@ const getSpecificLoan = (req, res) => {
   });
 };
 
-const updateLoan = (req, res) => {
+const updateLoanStatus = (req, res) => {
   const loanId = parseInt(req.params.id, 10);
   const { status } = req.body;
 
-  const loanIndex = Loans.findIndex(loan => loan.id === loanId);
-  if (loanIndex < 0) {
+  // const loanIndex = Loans.findIndex(loan => loan.id === loanId);
+  const loan = Loans.find(item => item.id === loanId);
+  if (!loan) {
     return res.status(400).json({
       status: 400,
       error: 'Invalid id parameter',
     });
   }
-  Loans[loanIndex].status = status;
+  loan.status = status;
   return res.json({
     status: 200,
-    data: Loans[loanIndex],
+    data: loan,
   });
 };
 
@@ -99,14 +100,13 @@ const repayLoan = (req, res) => {
   const loanId = parseInt(req.params.id, 10);
   const paidAmount = Number(req.body.paidAmount);
 
-  const loanIndex = Loans.findIndex(loan => loan.id === loanId);
-  if (loanIndex < 0) {
+  const loan = Loans.find(item => item.id === loanId);
+  if (!loan) {
     return res.status(400).json({
       status: 400,
       error: 'Invalid id parameter',
     });
   }
-  const loan = Loans[loanIndex];
   // check if loan has been approved
   if (loan.status !== 'approved') {
     return res.status(400).json({
@@ -133,20 +133,27 @@ const repayLoan = (req, res) => {
     loanId,
     createdOn: new Date(),
     paidAmount,
+    amount: loan.amount,
+    monthlyInstallment: loan.paymentInstallment,
+    balance: loan.balance,
   };
   Repayments.push(repayment);
 
   return res.status(201).json({
     status: 201,
-    data: {
-      ...repayment,
-      amount: loan.amount,
-      monthlyInstallment: loan.paymentInstallment,
-      balance: loan.balance,
-    },
+    data: repayment,
+  });
+};
+
+const getRepayments = (req, res) => {
+  const loanId = parseInt(req.params.id, 10);
+  const repayments = Repayments.filter(repayment => repayment.loanId === loanId);
+  return res.json({
+    status: 200,
+    data: repayments,
   });
 };
 
 export default {
-  createLoan, getAllLoans, getSpecificLoan, updateLoan, repayLoan,
+  createLoan, getAllLoans, getSpecificLoan, updateLoanStatus, repayLoan, getRepayments,
 };

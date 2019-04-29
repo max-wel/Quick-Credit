@@ -333,4 +333,17 @@ describe('Loan Tests', () => {
         });
     });
   });
+
+  describe('User GET loan repayment history', () => {
+    it('should return loan repayment history', (done) => {
+      request(app)
+        .get('/api/v1/loans/2/repayments')
+        .set('x-access-token', userToken)
+        .end((err, res) => {
+          expect(res.status).to.equal(200);
+          expect(res.body).to.have.property('data');
+          done();
+        });
+    });
+  });
 });
