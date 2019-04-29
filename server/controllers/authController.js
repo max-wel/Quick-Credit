@@ -73,4 +73,23 @@ const userSignin = (req, res) => {
   });
 };
 
-export default { userSignup, userSignin };
+const verifyClient = (req, res) => {
+  const { email } = req.params;
+  const { status } = req.body;
+
+  const client = Users.find(user => user.email === email);
+  if (!client) {
+    return res.status(404).json({
+      status: 404,
+      error: 'Client does not exist',
+    });
+  }
+  // modify client status
+  client.status = status;
+  return res.json({
+    status: 200,
+    data: client,
+  });
+};
+
+export default { userSignup, userSignin, verifyClient };

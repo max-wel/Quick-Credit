@@ -24,4 +24,5 @@ router.get('/loans/:id/repayments', verify.isLoggedIn, loansController.getRepaym
 // auth routes
 router.post('/auth/signup', validation.signupValidator, authController.userSignup);
 router.post('/auth/signin', authController.userSignin);
+router.patch('/users/:email/verify', verify.isLoggedIn, verify.adminOnly, validation.verifyClientValidator, authController.verifyClient);
 export default router;
