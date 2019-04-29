@@ -17,8 +17,9 @@ router.route('/loans')
   .get(verify.isLoggedIn, verify.adminOnly, loansController.getAllLoans);
 router.route('/loans/:id')
   .get(verify.isLoggedIn, verify.adminOnly, loansController.getSpecificLoan)
-  .patch(verify.isLoggedIn, verify.adminOnly, validation.updateLoanValidator, loansController.updateLoan);
+  .patch(verify.isLoggedIn, verify.adminOnly, validation.updateLoanValidator, loansController.updateLoanStatus);
 router.post('/loans/:id/repayment', verify.isLoggedIn, verify.adminOnly, validation.repayLoanValidator, loansController.repayLoan);
+router.get('/loans/:id/repayments', verify.isLoggedIn, loansController.getRepayments);
 
 // auth routes
 router.post('/auth/signup', validation.signupValidator, authController.userSignup);
