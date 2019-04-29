@@ -346,4 +346,40 @@ describe('Loan Tests', () => {
         });
     });
   });
+
+  describe('Admin verify client', () => {
+    it('should return a verified client', (done) => {
+      request(app)
+        .patch('/api/v1/users/rigatoni@gmail.com/verify')
+        .set('x-access-token', adminToken)
+        .send({ status: 'verified' })
+        .end((err, res) => {
+          expect(res.status).to.equal(200);
+          expect(res.body).to.have.property('data');
+          done();
+        });
+    });
+    it('should return an error when passed invalid email', (done) => {
+      request(app)
+        .patch('/api/v1/users/qwerty@gmail.com/verify')
+        .set('x-access-token', adminToken)
+        .send({ status: 'verified' })
+        .end((err, res) => {
+          expect(res.status).to.equal(404);
+          expect(res.body).to.have.property('error');
+          done();
+        });
+    });
+    it('should return an error when passed invalid status', (done) => {
+      request(app)
+        .patch('/api/v1/users/rigatoni@gmail.com/verify')
+        .set('x-access-token', adminToken)
+        .send({ status: 'qweerty' })
+        .end((err, res) => {
+          expect(res.status).to.equal(400);
+          expect(res.body).to.have.property('error');
+          done();
+        });
+    });
+  });
 });

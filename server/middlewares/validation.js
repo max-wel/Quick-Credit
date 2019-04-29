@@ -89,6 +89,18 @@ const repayLoanValidator = (req, res, next) => {
   }
   return next();
 };
+
+const verifyClientValidator = (req, res, next) => {
+  const { status } = req.body;
+  if (status === 'verified') {
+    return next();
+  }
+  return res.status(400).json({
+    status: 400,
+    error: 'Invalid status',
+  });
+};
+
 export default {
-  loanValidator, signupValidator, updateLoanValidator, repayLoanValidator,
+  loanValidator, signupValidator, updateLoanValidator, repayLoanValidator, verifyClientValidator,
 };
