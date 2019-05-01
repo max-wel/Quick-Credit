@@ -3,7 +3,7 @@ import passwordEncrypt from '../helpers/bcrypt';
 const users = [
   {
     id: 1,
-    email: 'rigatoni@gmail.com',
+    email: 'maximusekeh@gmail.com',
     firstName: 'Rigatoni',
     lastName: 'Pochettino',
     password: passwordEncrypt.hashPassword('qwerty'),

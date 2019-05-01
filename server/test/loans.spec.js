@@ -350,7 +350,7 @@ describe('Loan Tests', () => {
   describe('Admin verify client', () => {
     it('should return a verified client', (done) => {
       request(app)
-        .patch('/api/v1/users/rigatoni@gmail.com/verify')
+        .patch('/api/v1/users/memphis@gmail.com/verify')
         .set('x-access-token', adminToken)
         .send({ status: 'verified' })
         .end((err, res) => {
@@ -372,7 +372,7 @@ describe('Loan Tests', () => {
     });
     it('should return an error when passed invalid status', (done) => {
       request(app)
-        .patch('/api/v1/users/rigatoni@gmail.com/verify')
+        .patch('/api/v1/users/memphis@gmail.com/verify')
         .set('x-access-token', adminToken)
         .send({ status: 'qweerty' })
         .end((err, res) => {

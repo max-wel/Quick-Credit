@@ -1,5 +1,7 @@
 import { expect } from 'chai';
 import request from 'supertest';
+import jwt from 'jsonwebtoken';
+import Users from '../models/users';
 import app from '../app';
 
 const validUser = {
@@ -171,6 +173,119 @@ describe('POST user signin', () => {
       .end((err, res) => {
         expect(res.status).to.equal(400);
         expect(res.body).to.have.property('error');
+        done();
+      });
+  });
+});
+
+describe('User forgot password test', () => {
+  it('should send a password reset mail', (done) => {
+    request(app)
+      .post('/api/v1/auth/forgot_password')
+      .send({
+        email: 'maximusekeh@gmail.com',
+      })
+      .end((err, res) => {
+        expect(res.status).to.equal(200);
+        expect(res.body.data.message).to.equal('Password reset mail sent');
+        done();
+      });
+  });
+  it('should return an error if email does not exist', (done) => {
+    request(app)
+      .post('/api/v1/auth/forgot_password')
+      .send({
+        email: 'non-existent@gmail.com',
+      })
+      .end((err, res) => {
+        expect(res.status).to.equal(404);
+        expect(res.body.error).to.equal('Email does not exist');
+        done();
+      });
+  });
+});
+
+describe('User reset password test', () => {
+  const user = Users[0];
+  const validUserResetToken = jwt.sign({ id: user.id }, user.password, { expiresIn: '1h' });
+  const invalidUserResetToken = jwt.sign({ id: 20 }, user.password, { expiresIn: '1h' });
+  const invalidToken = jwt.sign({ id: user.id }, 'fake-secret', { expiresIn: '1h' });
+
+  it('should return an error when passed non-existing user', (done) => {
+    request(app)
+      .post(`/api/v1/auth/reset_password/${invalidUserResetToken}`)
+      .send({
+        password: 'new-pass',
+        confirmPassword: 'new-pass',
+      })
+      .end((err, res) => {
+        expect(res.status).to.equal(404);
+        expect(res.body.error).to.equal('User not found');
+        done();
+      });
+  });
+  it('should return an error when passed invalid token', (done) => {
+    request(app)
+      .post(`/api/v1/auth/reset_password/${invalidToken}`)
+      .send({
+        password: 'new-pass',
+        confirmPassword: 'new-pass',
+      })
+      .end((err, res) => {
+        expect(res.status).to.equal(400);
+        expect(res.body.error).to.equal('Expired reset link');
+        done();
+      });
+  });
+  it('should return an error when password is empty', (done) => {
+    request(app)
+      .post(`/api/v1/auth/reset_password/${validUserResetToken}`)
+      .send({
+        password: '',
+        confirmPassword: 'new-pass',
+      })
+      .end((err, res) => {
+        expect(res.status).to.equal(400);
+        expect(res.body.error).to.equal('Password is required');
+        done();
+      });
+  });
+  it('should return an error when password is not equal to confirm-password', (done) => {
+    request(app)
+      .post(`/api/v1/auth/reset_password/${validUserResetToken}`)
+      .send({
+        password: 'new-pass',
+        confirmPassword: 'not-new-pass',
+      })
+      .end((err, res) => {
+        expect(res.status).to.equal(400);
+        expect(res.body.error).to.equal('Password does not match');
+        done();
+      });
+  });
+  it('should reset user password', (done) => {
+    request(app)
+      .post(`/api/v1/auth/reset_password/${validUserResetToken}`)
+      .send({
+        password: 'new-pass',
+        confirmPassword: 'new-pass',
+      })
+      .end((err, res) => {
+        expect(res.status).to.equal(200);
+        expect(res.body.data.message).to.equal('Password reset successful');
+        done();
+      });
+  });
+  it('should return an error when valid token is used more than once', (done) => {
+    request(app)
+      .post(`/api/v1/auth/reset_password/${validUserResetToken}`)
+      .send({
+        password: 'new-pass',
+        confirmPassword: 'new-pass',
+      })
+      .end((err, res) => {
+        expect(res.status).to.equal(400);
+        expect(res.body.error).to.equal('Expired reset link');
         done();
       });
   });
