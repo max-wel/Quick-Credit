@@ -1,7 +1,7 @@
 const loans = [
   {
     id: 1,
-    user: 'sneaky@gmail.com',
+    user: 'maximusekeh@gmail.com',
     createdOn: new Date(),
     status: 'pending',
     repaid: false,

@@ -10,6 +10,7 @@ const transporter = nodemailer.createTransport({
     pass: process.env.PASSWORD,
   },
 });
+
 const sendResetMail = (user, token) => {
   const mailOptions = {
     from: 'notification@quick-credit',
@@ -19,4 +20,15 @@ const sendResetMail = (user, token) => {
   };
   transporter.sendMail(mailOptions, (err, info) => console.log(err, info));
 };
-export default { sendResetMail };
+
+const sendLoanNotificationMail = (user, status) => {
+  const mailOptions = {
+    from: 'notification@quick-credit',
+    to: user.email,
+    subject: 'Password Recovery',
+    html: template.notification(user, status),
+  };
+  transporter.sendMail(mailOptions, (err, info) => console.log(err, info));
+};
+
+export default { sendResetMail, sendLoanNotificationMail };
