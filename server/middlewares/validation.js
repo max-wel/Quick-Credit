@@ -101,6 +101,23 @@ const verifyClientValidator = (req, res, next) => {
   });
 };
 
+const passwordResetValidator = (req, res, next) => {
+  const { password, confirmPassword } = req.body;
+  if (!password || password.trim() === '') {
+    return res.status(400).json({
+      status: 400,
+      error: 'Password is required',
+    });
+  }
+  if (password !== confirmPassword) {
+    return res.status(400).json({
+      status: 400,
+      error: 'Password does not match',
+    });
+  }
+  return next();
+};
+
 export default {
-  loanValidator, signupValidator, updateLoanValidator, repayLoanValidator, verifyClientValidator,
+  loanValidator, signupValidator, updateLoanValidator, repayLoanValidator, verifyClientValidator, passwordResetValidator,
 };

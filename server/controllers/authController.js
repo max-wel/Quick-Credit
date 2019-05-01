@@ -2,6 +2,7 @@ import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import Users from '../models/users';
 import passwordEncrypt from '../helpers/bcrypt';
+import mailer from '../helpers/mailer';
 
 dotenv.config();
 const jwtSecret = process.env.JWT_SECRET;
@@ -92,4 +93,64 @@ const verifyClient = (req, res) => {
   });
 };
 
-export default { userSignup, userSignin, verifyClient };
+const forgotPassword = (req, res) => {
+  const { email } = req.body;
+  // check if user with the email exists
+  const user = Users.find(item => item.email === email);
+  if (!user) {
+    return res.status(404).json({
+      status: 404,
+      error: 'Email does not exist',
+    });
+  }
+  // create reset token (sign with user password hash)
+  const resetSecret = user.password;
+  const resetToken = jwt.sign({ id: user.id }, resetSecret, { expiresIn: '1h' });
+  console.log(resetToken);
+  // send reset mail with password reset link
+  mailer.sendResetMail(user, resetToken);
+  return res.json({
+    status: 200,
+    data: {
+      message: 'Password reset mail sent',
+    },
+  });
+};
+
+const resetPassword = (req, res) => {
+  const resetToken = req.params.token;
+  const { password } = req.body;
+
+  // get user id from token
+  const { id } = jwt.decode(resetToken) || {};
+  const user = Users.find(item => item.id === id);
+  if (!user) {
+    return res.status(404).json({
+      status: 404,
+      error: 'User not found',
+    });
+  }
+  // get user password and use as secret for one time token use
+  const resetSecret = user.password;
+
+  jwt.verify(resetToken, resetSecret, (err, decoded) => {
+    if (err) {
+      return res.status(400).json({
+        status: 400,
+        error: 'Expired reset link',
+      });
+    }
+    // update password
+    user.password = passwordEncrypt.hashPassword(password);
+    return res.json({
+      status: 200,
+      data: {
+        message: 'Password reset successful',
+      },
+    });
+  });
+};
+
+export default {
+  userSignup, userSignin, verifyClient, forgotPassword, resetPassword,
+};
