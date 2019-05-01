@@ -1,5 +1,7 @@
 import Loans from '../models/loans';
 import Repayments from '../models/repayments';
+import Users from '../models/users';
+import mailer from '../helpers/mailer';
 
 const createLoan = (req, res) => {
   const { user } = req.body;
@@ -81,7 +83,6 @@ const updateLoanStatus = (req, res) => {
   const loanId = parseInt(req.params.id, 10);
   const { status } = req.body;
 
-  // const loanIndex = Loans.findIndex(loan => loan.id === loanId);
   const loan = Loans.find(item => item.id === loanId);
   if (!loan) {
     return res.status(400).json({
@@ -89,7 +90,11 @@ const updateLoanStatus = (req, res) => {
       error: 'Invalid id parameter',
     });
   }
+  // update loan status
   loan.status = status;
+  // get user and send notification mail
+  const user = Users.find(item => item.email === loan.user);
+  mailer.sendLoanNotificationMail(user, status);
   return res.json({
     status: 200,
     data: loan,
