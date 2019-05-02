@@ -4,7 +4,7 @@ import Users from '../models/users';
 import mailer from '../helpers/mailer';
 
 const createLoan = (req, res) => {
-  const { user } = req.body;
+  const { email } = req.user;
   const amount = Number(req.body.amount);
   const tenor = Number(req.body.tenor);
   const interest = Number(((5 / 100) * amount).toFixed(2));
@@ -12,7 +12,7 @@ const createLoan = (req, res) => {
 
   const newLoan = {
     id: Loans.length + 1,
-    user,
+    user: email,
     createdOn: new Date(),
     status: 'pending',
     repaid: false,
@@ -23,13 +23,13 @@ const createLoan = (req, res) => {
     interest,
   };
 
-  const existingLoans = Loans.filter(loan => loan.user === user);
+  const existingLoans = Loans.filter(loan => loan.user === email);
 
   const repaidLoan = existingLoans.filter(loan => loan.repaid === false);
   if (repaidLoan.length !== 0) {
     return res.status(400).json({
       status: 400,
-      error: 'Unsettle',
+      error: 'You have an unsettled loan',
     });
   }
 

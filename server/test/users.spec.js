@@ -207,9 +207,9 @@ describe('User forgot password test', () => {
 
 describe('User reset password test', () => {
   const user = Users[0];
-  const validUserResetToken = jwt.sign({ id: user.id }, user.password, { expiresIn: '1h' });
-  const invalidUserResetToken = jwt.sign({ id: 20 }, user.password, { expiresIn: '1h' });
-  const invalidToken = jwt.sign({ id: user.id }, 'fake-secret', { expiresIn: '1h' });
+  const validUserResetToken = jwt.sign({ email: user.email }, user.password, { expiresIn: '1h' });
+  const invalidUserResetToken = jwt.sign({ email: 'non@gmail.com' }, user.password, { expiresIn: '1h' });
+  const invalidToken = jwt.sign({ email: user.email }, 'fake-secret', { expiresIn: '1h' });
 
   it('should return an error when passed non-existing user', (done) => {
     request(app)

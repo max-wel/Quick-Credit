@@ -4,7 +4,7 @@ const loans = [
     user: 'maximusekeh@gmail.com',
     createdOn: new Date(),
     status: 'pending',
-    repaid: false,
+    repaid: true,
     tenor: 4,
     amount: 1200.00,
     paymentInstallment: 315.00,

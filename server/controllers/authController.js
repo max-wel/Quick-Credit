@@ -1,11 +1,8 @@
 import jwt from 'jsonwebtoken';
-import dotenv from 'dotenv';
+import generateToken from '../helpers/generateToken';
 import Users from '../models/users';
 import passwordEncrypt from '../helpers/bcrypt';
 import mailer from '../helpers/mailer';
-
-dotenv.config();
-const jwtSecret = process.env.JWT_SECRET;
 
 const userSignup = (req, res) => {
   const {
@@ -31,7 +28,7 @@ const userSignup = (req, res) => {
   };
   Users.push(newUser);
   // create token
-  const token = jwt.sign({ id: newUser.id, isAdmin: newUser.isAdmin }, jwtSecret, { expiresIn: '1h' });
+  const token = generateToken.signToken({ email: newUser.email, isAdmin: newUser.isAdmin });
 
   return res.status(201).json({
     status: 201,
@@ -61,7 +58,7 @@ const userSignin = (req, res) => {
     });
   }
   // create token
-  const token = jwt.sign({ id: user.id, isAdmin: user.isAdmin }, jwtSecret, { expiresIn: '1h' });
+  const token = generateToken.signToken({ email: user.email, isAdmin: user.isAdmin });
   return res.json({
     status: 200,
     data: {
@@ -105,7 +102,7 @@ const forgotPassword = (req, res) => {
   }
   // create reset token (sign with user password hash)
   const resetSecret = user.password;
-  const resetToken = jwt.sign({ id: user.id }, resetSecret, { expiresIn: '1h' });
+  const resetToken = generateToken.signToken({ email: user.email }, resetSecret, '1h');
   console.log(resetToken);
   // send reset mail with password reset link
   mailer.sendResetMail(user, resetToken);
@@ -121,9 +118,9 @@ const resetPassword = (req, res) => {
   const resetToken = req.params.token;
   const { password } = req.body;
 
-  // get user id from token
-  const { id } = jwt.decode(resetToken) || {};
-  const user = Users.find(item => item.id === id);
+  // get user email from token
+  const { email } = jwt.decode(resetToken) || {};
+  const user = Users.find(item => item.email === email);
   if (!user) {
     return res.status(404).json({
       status: 404,

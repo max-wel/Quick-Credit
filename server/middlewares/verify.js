@@ -18,7 +18,7 @@ const isLoggedIn = (req, res, next) => {
         error: 'Invalid token',
       });
     }
-    req.user = { id: decoded.id, isAdmin: decoded.isAdmin };
+    req.user = { email: decoded.email, isAdmin: decoded.isAdmin };
     return next();
   });
 };
