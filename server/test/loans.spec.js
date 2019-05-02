@@ -224,7 +224,7 @@ describe('Loan Tests', () => {
   describe('Admin approve/reject loan application', () => {
     it('should approve a loan application', (done) => {
       request(app)
-        .patch('/api/v1/loans/1')
+        .patch('/api/v1/loans/6')
         .set('x-access-token', adminToken)
         .send({ status: 'approved' })
         .end((err, res) => {
@@ -273,7 +273,7 @@ describe('Loan Tests', () => {
   describe('Admin POST loan repayment', () => {
     it('should create a loan repayment', (done) => {
       request(app)
-        .post('/api/v1/loans/2/repayment')
+        .post('/api/v1/loans/6/repayment')
         .set('x-access-token', adminToken)
         .send({ paidAmount: '400.00' })
         .end((err, res) => {
@@ -335,11 +335,33 @@ describe('Loan Tests', () => {
   describe('User GET loan repayment history', () => {
     it('should return loan repayment history', (done) => {
       request(app)
-        .get('/api/v1/loans/2/repayments')
+        .get('/api/v1/loans/6/repayments')
         .set('x-access-token', userToken)
         .end((err, res) => {
           expect(res.status).to.equal(200);
           expect(res.body).to.have.property('data');
+          done();
+        });
+    });
+    it('should return an error when passed invalid loan id', (done) => {
+      request(app)
+        .get('/api/v1/loans/70/repayments')
+        .set('x-access-token', userToken)
+        .end((err, res) => {
+          expect(res.status).to.equal(400);
+          expect(res.body).to.have.property('error');
+          expect(res.body.error).to.equal('Invalid loan id');
+          done();
+        });
+    });
+    it('should return an error if loan does not belong to user', (done) => {
+      request(app)
+        .get('/api/v1/loans/2/repayments')
+        .set('x-access-token', userToken)
+        .end((err, res) => {
+          expect(res.status).to.equal(403);
+          expect(res.body).to.have.property('error');
+          expect(res.body.error).to.equal('Access forbidden');
           done();
         });
     });
