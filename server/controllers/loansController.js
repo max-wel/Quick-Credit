@@ -152,6 +152,21 @@ const repayLoan = (req, res) => {
 
 const getRepayments = (req, res) => {
   const loanId = parseInt(req.params.id, 10);
+  const { email } = req.user;
+  // check if loan belongs to user (get user email from loan db)
+  const loan = Loans.find(item => item.id === loanId);
+  if (!loan) {
+    return res.status(400).json({
+      status: 400,
+      error: 'Invalid loan id',
+    });
+  }
+  if (loan.user !== email) {
+    return res.status(403).json({
+      status: 403,
+      error: 'Access forbidden',
+    });
+  }
   const repayments = Repayments.filter(repayment => repayment.loanId === loanId);
   return res.json({
     status: 200,
