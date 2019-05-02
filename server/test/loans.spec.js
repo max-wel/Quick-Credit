@@ -64,7 +64,6 @@ describe('Loan Tests', () => {
         .post('/api/v1/loans')
         .set('x-access-token', userToken)
         .send({
-          user: 'santorini@gmail.com',
           tenor: '5',
           amount: '1500.00',
         })
@@ -79,29 +78,13 @@ describe('Loan Tests', () => {
         .post('/api/v1/loans')
         .set('x-access-token', userToken)
         .send({
-          user: 'santorini@gmail.com',
           tenor: '5',
           amount: '1500.00',
         })
         .end((err, res) => {
           expect(res.status).to.equal(400);
           expect(res.body).to.have.property('error');
-          done();
-        });
-    });
-
-    it('should return an error if user field is empty', (done) => {
-      request(app)
-        .post('/api/v1/loans')
-        .set('x-access-token', userToken)
-        .send({
-          user: '  ',
-          tenor: '5',
-          amount: '1500.00',
-        })
-        .end((err, res) => {
-          expect(res.status).to.equal(400);
-          expect(res.body).to.have.property('error');
+          expect(res.body.error).to.equal('You have an unsettled loan');
           done();
         });
     });
@@ -110,13 +93,13 @@ describe('Loan Tests', () => {
         .post('/api/v1/loans')
         .set('x-access-token', userToken)
         .send({
-          user: 'max@gmail.com',
           tenor: '',
           amount: '1500.00',
         })
         .end((err, res) => {
           expect(res.status).to.equal(400);
           expect(res.body).to.have.property('error');
+          expect(res.body.error).to.equal('Tenor is required');
           done();
         });
     });
@@ -125,13 +108,13 @@ describe('Loan Tests', () => {
         .post('/api/v1/loans')
         .set('x-access-token', userToken)
         .send({
-          user: 'max@gmail.com',
           tenor: '13',
           amount: '1500.00',
         })
         .end((err, res) => {
           expect(res.status).to.equal(400);
           expect(res.body).to.have.property('error');
+          expect(res.body.error).to.equal('Invalid tenor');
           done();
         });
     });
@@ -140,13 +123,28 @@ describe('Loan Tests', () => {
         .post('/api/v1/loans')
         .set('x-access-token', userToken)
         .send({
-          user: 'max@gmail.com',
           tenor: '3',
           amount: '',
         })
         .end((err, res) => {
           expect(res.status).to.equal(400);
           expect(res.body).to.have.property('error');
+          expect(res.body.error).to.equal('Amount is required');
+          done();
+        });
+    });
+    it('should return an error when passed invalid amount', (done) => {
+      request(app)
+        .post('/api/v1/loans')
+        .set('x-access-token', userToken)
+        .send({
+          tenor: '3',
+          amount: '150A.00',
+        })
+        .end((err, res) => {
+          expect(res.status).to.equal(400);
+          expect(res.body).to.have.property('error');
+          expect(res.body.error).to.equal('Invalid amount');
           done();
         });
     });
