@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import template from './templates';
 
 dotenv.config();
+
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
@@ -11,6 +12,12 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+/**
+ * @function sendResetMail
+ * @description Sends password reset mail
+ * @param {Object} user User object
+ * @param {String} token Token
+ */
 const sendResetMail = (user, token) => {
   const mailOptions = {
     from: 'notification@quick-credit',
@@ -21,6 +28,12 @@ const sendResetMail = (user, token) => {
   transporter.sendMail(mailOptions, (err, info) => console.log(err, info));
 };
 
+/**
+ * @function sendLoanNotificationMail
+ * @description Sends approval/rejection notification mail
+ * @param {Object} user User object
+ * @param {String} status Loan status
+ */
 const sendLoanNotificationMail = (user, status) => {
   const mailOptions = {
     from: 'notification@quick-credit',

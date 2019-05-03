@@ -3,6 +3,13 @@ import Repayments from '../models/repayments';
 import Users from '../models/users';
 import mailer from '../helpers/mailer';
 
+/**
+ * @function createLoan
+ * @description Creates new loan
+ * @param {object} req Request Object
+ * @param {object} res Response Object
+ * @returns {object} JSON Response
+ */
 const createLoan = (req, res) => {
   const { email } = req.user;
   const amount = Number(req.body.amount);
@@ -40,6 +47,13 @@ const createLoan = (req, res) => {
   });
 };
 
+/**
+ * @function getAllLoans
+ * @description Returns all loans
+ * @param {object} req Request Object
+ * @param {object} res Response Object
+ * @returns {object} JSON Response
+ */
 const getAllLoans = (req, res) => {
   const { status, repaid } = req.query;
 
@@ -64,6 +78,13 @@ const getAllLoans = (req, res) => {
   });
 };
 
+/**
+ * @function getSpecificLoan
+ * @description Returns a specific loan
+ * @param {object} req Request Object
+ * @param {object} res Response Object
+ * @returns {object} JSON Response
+ */
 const getSpecificLoan = (req, res) => {
   const loanId = parseInt(req.params.id, 10);
   const loan = Loans.find(item => item.id === loanId);
@@ -79,6 +100,13 @@ const getSpecificLoan = (req, res) => {
   });
 };
 
+/**
+ * @function updateLoanStatus
+ * @description Approves/Rejects loan application
+ * @param {object} req Request Object
+ * @param {object} res Response Object
+ * @returns {object} JSON Response
+ */
 const updateLoanStatus = (req, res) => {
   const loanId = parseInt(req.params.id, 10);
   const { status } = req.body;
@@ -101,6 +129,13 @@ const updateLoanStatus = (req, res) => {
   });
 };
 
+/**
+ * @function repayLoan
+ * @description Creates new Loan repayment
+ * @param {object} req Request Object
+ * @param {object} res Response Object
+ * @returns {object} JSON Response
+ */
 const repayLoan = (req, res) => {
   const loanId = parseInt(req.params.id, 10);
   const paidAmount = Number(req.body.paidAmount);
@@ -150,6 +185,13 @@ const repayLoan = (req, res) => {
   });
 };
 
+/**
+ * @function getRepayments
+ * @description Returns user repayment history
+ * @param {object} req Request Object
+ * @param {object} res Response Object
+ * @returns {object} JSON Response
+ */
 const getRepayments = (req, res) => {
   const loanId = parseInt(req.params.id, 10);
   const { email } = req.user;

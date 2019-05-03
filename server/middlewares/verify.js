@@ -3,6 +3,15 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 const secret = process.env.JWT_SECRET;
+
+/**
+ * @function isLoggedIn
+ * @description Verifies user signin token
+ * @param {object} req Request Object
+ * @param {object} res Response Object
+ * @param {function} next Next middleware function
+ * @returns {function} Next function
+ */
 const isLoggedIn = (req, res, next) => {
   const token = req.headers['x-access-token'];
   if (!token) {
@@ -23,6 +32,14 @@ const isLoggedIn = (req, res, next) => {
   });
 };
 
+/**
+ * @function adminOnly
+ * @description Verifies that user is an admin
+ * @param {object} req Request Object
+ * @param {object} res Response Object
+ * @param {function} next Next middleware function
+ * @returns {function} Next function
+ */
 const adminOnly = (req, res, next) => {
   const { isAdmin } = req.user;
   if (!isAdmin) {

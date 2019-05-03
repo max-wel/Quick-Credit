@@ -4,6 +4,13 @@ import Users from '../models/users';
 import passwordEncrypt from '../helpers/bcrypt';
 import mailer from '../helpers/mailer';
 
+/**
+ * @function userSignup
+ * @description Creates new user
+ * @param {object} req Request Object
+ * @param {object} res Response Object
+ * @returns {object} JSON Response
+ */
 const userSignup = (req, res) => {
   const {
     email, firstName, lastName, password, address,
@@ -42,6 +49,13 @@ const userSignup = (req, res) => {
   });
 };
 
+/**
+ * @function userSignin
+ * @description Logs in user
+ * @param {object} req Request Object
+ * @param {object} res Response Object
+ * @returns {object} JSON Response
+ */
 const userSignin = (req, res) => {
   const { email, password } = req.body;
   const user = Users.find(item => item.email === email);
@@ -71,6 +85,13 @@ const userSignin = (req, res) => {
   });
 };
 
+/**
+ * @function verifyClient
+ * @description Marks client as verified
+ * @param {object} req Request Object
+ * @param {object} res Response Object
+ * @returns {object} JSON Response
+ */
 const verifyClient = (req, res) => {
   const { email } = req.params;
   const { status } = req.body;
@@ -90,6 +111,13 @@ const verifyClient = (req, res) => {
   });
 };
 
+/**
+ * @function forgotPassword
+ * @description Sends password reset mail
+ * @param {object} req Request Object
+ * @param {object} res Response Object
+ * @returns {object} JSON Response
+ */
 const forgotPassword = (req, res) => {
   const { email } = req.body;
   // check if user with the email exists
@@ -114,6 +142,13 @@ const forgotPassword = (req, res) => {
   });
 };
 
+/**
+ * @function resetPassword
+ * @description Resets user's password
+ * @param {object} req Request Object
+ * @param {object} res Response Object
+ * @returns {object} JSON Response
+ */
 const resetPassword = (req, res) => {
   const resetToken = req.params.token;
   const { password } = req.body;

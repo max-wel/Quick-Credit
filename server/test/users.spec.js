@@ -160,6 +160,7 @@ describe('POST user signin', () => {
       .end((err, res) => {
         expect(res.status).to.equal(400);
         expect(res.body).to.have.property('error');
+        expect(res.body.error).to.equal('Invalid login credentials');
         done();
       });
   });
@@ -173,6 +174,35 @@ describe('POST user signin', () => {
       .end((err, res) => {
         expect(res.status).to.equal(400);
         expect(res.body).to.have.property('error');
+        expect(res.body.error).to.equal('Invalid login credentials');
+        done();
+      });
+  });
+  it('should return an error when user tries to signin with an empty email', (done) => {
+    request(app)
+      .post('/api/v1/auth/signin')
+      .send({
+        email: '',
+        password: 'Lyonnais',
+      })
+      .end((err, res) => {
+        expect(res.status).to.equal(400);
+        expect(res.body).to.have.property('error');
+        expect(res.body.error).to.equal('Email is required');
+        done();
+      });
+  });
+  it('should return an error when user tries to signin with an empty password', (done) => {
+    request(app)
+      .post('/api/v1/auth/signin')
+      .send({
+        email: 'memphis@gmail.com',
+        password: '',
+      })
+      .end((err, res) => {
+        expect(res.status).to.equal(400);
+        expect(res.body).to.have.property('error');
+        expect(res.body.error).to.equal('Password is required');
         done();
       });
   });
