@@ -3,7 +3,13 @@
   "version": "1.0.0",
   "description": "Online lending platform that provides short term soft loans",
   "main": "app.js",
+  "engines": {
+    "node": "11.4.0"
+  },
   "scripts": {
+    "prebuild": "rm -rf dist",
+    "build": "babel server -d dist",
+    "start": "node dist/app",
     "test": "nyc --reporter=html mocha --require babel-register ./server/test/index.spec --exit",
     "start:dev": "nodemon --exec babel-node ./server/app.js",
     "coverage": "nyc report --reporter=text-lcov | coveralls"
