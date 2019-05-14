@@ -117,12 +117,15 @@ p>a {
     justify-content: start;
     padding: 1.5em;
   }
+  .nav-heading {
+    margin-left: 1.3em;
+  }
   .top-nav.responsive {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    position: fixed;
+    position: absolute;
     height: 25%;
     width: 100%;
     background-color: #333;
