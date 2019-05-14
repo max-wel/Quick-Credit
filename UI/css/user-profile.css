@@ -58,8 +58,18 @@ hr {
 .loan-link {
   text-decoration: none;
   font-size: 1.5em;
-  margin-bottom: 1.5em;
+  margin-bottom: 0.7em;
+  padding-top: 0.3em;
+  padding-bottom: 0.5em;
+  width: 100%;
+  text-align: center;
   color: white;
+}
+.loan-item {
+  color: white;
+}
+.loan-link:hover {
+  background-color: rgb(140, 143, 140);
 }
 .loan-link.logout {
   margin-top: 1em;
@@ -186,7 +196,12 @@ input {
 /*media queries*/
 @media only screen and (max-width: 600px) {
   .side-panel {
-    display: none;
+    display: flex;
+    position: absolute;
+    width: 80%;
+    z-index: 100;
+    left: -80%;
+    transition: all 1.2s;
   }
   .nav-toggle {
     display: block;
@@ -195,11 +210,11 @@ input {
   nav {
     padding: 1.5em;
   }
+  .nav-heading {
+    margin-left: 1.2em;
+  }
   .side-panel.responsive {
-    display: flex;
-    position: absolute;
-    width: 80%;
-    z-index: 100;
+    left: 0;
   }
   .main-panel {
     flex-basis: 100%;
@@ -228,7 +243,14 @@ input {
 }
 @media only screen and (min-device-width: 600px) and (max-device-width: 1024px) {
   .side-panel {
-    display: none;
+    display: flex;
+    position: fixed;
+    width: 60%;
+    z-index: 5;
+    height: 100%;
+    top: 76px;
+    left: -60%;
+    transition: all 1.2s;
   }
   .nav-toggle {
     display: block;
@@ -240,13 +262,12 @@ input {
     position: fixed;
     z-index: 100;
   }
+  .nav-heading {
+    width: 90%;
+    text-align: center;
+  }
   .side-panel.responsive {
-    display: flex;
-    position: fixed;
-    width: 60%;
-    z-index: 5;
-    height: 100%;
-    top: 76px;
+    left: 0;
   }
   .main-panel {
     flex-basis: 100%;
