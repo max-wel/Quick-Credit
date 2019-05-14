@@ -16,6 +16,9 @@ nav {
   align-items: baseline;
   padding: 1.6em 4em;
   box-shadow: 0 4px 5px -5px rgb(173, 172, 172);
+  position: fixed;
+  background-color: white;
+  z-index: 100;
 }
 .nav-heading a{
   text-decoration: none;
@@ -36,42 +39,75 @@ nav {
   align-items: center;
   /* padding-top: 3em; */
   border-right: 1px solid rgb(107, 107, 107);
+  position: fixed;
+  top: 5em;
+  width: 25%;
+}
+.avatar {
+  width: 8em;
+  height: 8em;
+  border: 1px solid rgb(189, 187, 187);
+  border-radius: 50%;
+  overflow: hidden;
+  padding-top: 0.3em;
+  margin-top: 0.5em;
 }
 .admin-heading {
   color: white;
-  margin-top: 2em;
+  margin-top: 1.7em;
   margin-bottom: 0.6em;
-  font-size: 1.5em;
+  font-size: 1.2em;
   letter-spacing: 1.5px;
-  border-bottom: 4px solid white;
+  border-bottom: 2.5px solid white;
   padding-bottom: 3px;
 }
 .admin-name {
-  margin: 1.5em 0;
-  font-size: 1.5em;
+  /* margin: 1.5em 0; */
+  font-size: 1.4em;
   color: white;
+  margin-bottom: 1em;
+  margin-top: 0.5em;
 }
 hr {
   width: 100%;
   border: 0.7px solid rgb(85, 84, 84);
-  margin-bottom: 2.5em;
+  margin-bottom: 1.3em;
 }
 .loan-link {
   text-decoration: none;
-  font-size: 1.5em;
-  margin-bottom: 1.5em;
+  font-size: 1.4em;
+  padding-top: 0.3em;
+  padding-bottom: 0.5em;
+  margin-bottom: 0.8em;
+  color: white;
+  display: block;
+  width: 100%;
+  text-align: center;
+}
+.loan-item {
   color: white;
 }
-.loan-link:hover {
-  color: rgb(170, 255, 170);
+.loan-link.logout {
+  width: 70%;
 }
-.loan-link.current {
-  padding-bottom: 2px;
+.loan-link:hover {
+  background-color: rgb(140, 143, 140);
+}
+.loan-item.all_loans {
+  padding-bottom: 1.6px;
+  border-bottom: 4px solid rgb(255, 255, 255)
+}
+.loan-item.current {
+  padding-bottom: 1.6px;
   border-bottom: 4px solid rgb(255, 255, 0)
 }
-.loan-link.repaid {
-  padding-bottom: 3px;
-  border-bottom: 4px solid rgb(115, 255, 0)
+.loan-item.repaid {
+  padding-bottom: 1.6px;
+  border-bottom: 4px solid rgb(9, 255, 0)
+}
+.loan-item.client {
+  padding-bottom: 1.6px;
+  border-bottom: 4px solid rgb(255, 255, 255)
 }
 .loan-link.logout {
   padding: 0.3em 0.6em;
@@ -79,12 +115,15 @@ hr {
 }
 .main-panel {
   flex-basis: 75%;
+  position: relative;
+  left: 25%;
+  top: 5em;
 }
 .main-panel__heading {
   text-align: center;
   font-weight: 700;
   font-size: 1.5em;
-  margin-top: 1.5em;
+  margin-top: 1.2em;
   margin-bottom: 1em;
 }
 /* table */
@@ -155,7 +194,15 @@ td:nth-child(5) {
 /*media queries*/
 @media only screen and (max-width: 600px) {
   .side-panel {
-    display: none;
+    /* display: none; */
+    display: flex;
+    position: fixed;
+    width: 80%;
+    z-index: 5;
+    height: 100%;
+    top: 76px;
+    left: -80%;
+    transition: all 1.3s;
   }
   .nav-toggle {
     display: block;
@@ -167,18 +214,27 @@ td:nth-child(5) {
     position: fixed;
     z-index: 100;
   }
+  .nav-heading {
+    margin-left: 1em;
+  }
   .side-panel.responsive {
-    display: flex;
-    position: fixed;
-    width: 80%;
-    z-index: 5;
-    height: 100%;
-    top: 76px;
+    left: 0;
+  }
+  .avatar {
+    width: 6em;
+    height: 6em;
+  }
+  .admin-heading {
+    margin-top: 1.3em;
+  }
+  .loan-link {
+    margin-bottom: 0.5em;
   }
   .main-panel {
     flex-basis: 100%;
     position: relative;
     top: 76px;
+    left: 0;
     z-index: 1;
   }
 
@@ -238,11 +294,19 @@ td:nth-child(5) {
 
 @media only screen and (min-device-width: 600px) and (max-device-width: 1024px) {
   .side-panel {
-    display: none;
+    display: flex;
+    position: fixed;
+    width: 60%;
+    z-index: 5;
+    height: 100%;
+    top: 76px;
+    left: -60%;
+    transition: all 1.3s;
   }
   .nav-toggle {
     display: block;
     margin-right: 1.5em;
+    margin-left: 1em;
   }
   nav {
     padding: 1.5em;
@@ -250,18 +314,18 @@ td:nth-child(5) {
     position: fixed;
     z-index: 100;
   }
+  .nav-heading {
+    width: 90%;
+    text-align: center;
+  }
   .side-panel.responsive {
-    display: flex;
-    position: fixed;
-    width: 60%;
-    z-index: 5;
-    height: 100%;
-    top: 76px;
+    left: 0;
   }
   .main-panel {
     flex-basis: 100%;
     position: relative;
     top: 76px;
+    left: 0;
     z-index: 1;
   }
 }
