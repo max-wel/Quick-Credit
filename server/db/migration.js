@@ -10,6 +10,7 @@ const migrate = async () => {
     if (!result.rows[0]) {
       await pool.query(createAdmin);
     }
+    await pool.end();
   } catch (error) {
     console.log(error);
   }

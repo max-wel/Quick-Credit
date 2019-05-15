@@ -8,7 +8,7 @@ services:
 
 before_script:
   - psql -c 'create database "Quick-Credit-TEST";' -U postgres
-  
+  - npm run migration
 script:
   - npm test
 
