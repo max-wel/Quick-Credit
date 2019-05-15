@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import swaggerUi from 'swagger-ui-express';
-import swaggerDoc from '../swagger.json';
+import swaggerDoc from '../docs/swagger.json';
 import loansController from '../controllers/loansController';
 import authController from '../controllers/authController';
 import validation from '../middlewares/validation';
