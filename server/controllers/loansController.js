@@ -109,6 +109,7 @@ const getSpecificLoan = (req, res) => {
  */
 const updateLoanStatus = (req, res) => {
   const loanId = parseInt(req.params.id, 10);
+  console.log(loanId);
   const { status } = req.body;
 
   const loan = Loans.find(item => item.id === loanId);

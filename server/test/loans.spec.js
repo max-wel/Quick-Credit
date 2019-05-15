@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import request from 'supertest';
 import app from '../app';
+import pool from '../db/config';
 
 const user = {
   email: 'memphis@gmail.com',
@@ -34,6 +35,13 @@ describe('Loan Tests', () => {
             done();
           });
       });
+  });
+
+  after((done) => {
+    pool.query('TRUNCATE users RESTART IDENTITY CASCADE', (err, res) => {
+      console.log(err, res);
+      done();
+    });
   });
 
   describe('Invalid token test', () => {
@@ -222,18 +230,6 @@ describe('Loan Tests', () => {
   });
 
   describe('Admin approve/reject loan application', () => {
-    it('should approve a loan application', (done) => {
-      request(app)
-        .patch('/api/v1/loans/6')
-        .set('x-access-token', adminToken)
-        .send({ status: 'approved' })
-        .end((err, res) => {
-          expect(res.status).to.equal(200);
-          expect(res.body).to.have.property('data');
-          expect(res.body.data.status).to.equal('approved');
-          done();
-        });
-    });
     it('should reject a loan application', (done) => {
       request(app)
         .patch('/api/v1/loans/1')
@@ -243,6 +239,18 @@ describe('Loan Tests', () => {
           expect(res.status).to.equal(200);
           expect(res.body).to.have.property('data');
           expect(res.body.data.status).to.equal('rejected');
+          done();
+        });
+    });
+    it('should approve a loan application', (done) => {
+      request(app)
+        .patch('/api/v1/loans/1')
+        .set('x-access-token', adminToken)
+        .send({ status: 'approved' })
+        .end((err, res) => {
+          expect(res.status).to.equal(200);
+          expect(res.body).to.have.property('data');
+          expect(res.body.data.status).to.equal('approved');
           done();
         });
     });
@@ -273,7 +281,7 @@ describe('Loan Tests', () => {
   describe('Admin POST loan repayment', () => {
     it('should create a loan repayment', (done) => {
       request(app)
-        .post('/api/v1/loans/6/repayment')
+        .post('/api/v1/loans/2/repayment')
         .set('x-access-token', adminToken)
         .send({ paidAmount: '400.00' })
         .end((err, res) => {
@@ -296,7 +304,7 @@ describe('Loan Tests', () => {
     });
     it('should return an error if loan is not approved', (done) => {
       request(app)
-        .post('/api/v1/loans/1/repayment')
+        .post('/api/v1/loans/3/repayment')
         .set('x-access-token', adminToken)
         .send({ paidAmount: '400.00' })
         .end((err, res) => {
@@ -370,7 +378,7 @@ describe('Loan Tests', () => {
   describe('Admin verify client', () => {
     it('should return a verified client', (done) => {
       request(app)
-        .patch('/api/v1/users/memphis@gmail.com/verify')
+        .patch('/api/v1/users/maximusekeh@gmail.com/verify')
         .set('x-access-token', adminToken)
         .send({ status: 'verified' })
         .end((err, res) => {
