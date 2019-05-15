@@ -1,0 +1,801 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0",
+    "title": "Quick Credit",
+    "description": "An  online lending platform that provides short term soft loans to individuals. This helps solve problems of financial inclusion as a way to alleviate poverty"
+  },
+  "host": "quick-credit-max.herokuapp.com",
+  "schemes": [
+    "https"
+  ],
+  "basePath": "/api/v1",
+  "securityDefinitions": {
+    "Bearer": {
+      "type": "apiKey",
+      "name": "x-access-token",
+      "in": "header"
+    }
+  },
+  "tags": [
+    {
+      "name": "Authentication"
+    },
+    {
+      "name": "Users"
+    },
+    {
+      "name": "Admin"
+    }
+  ],
+  "paths": {
+    "/auth/signup": {
+      "post": {
+        "summary": "Sign up",
+        "description": "Creates a new user",
+        "tags": [
+          "Authentication"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "description": "User object",
+            "schema": {
+              "$ref": "#/definitions/signupRequest"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Successful registration",
+            "schema": {
+              "$ref": "#/definitions/signupResponse"
+            }
+          },
+          "400": {
+            "description": "User with email already exist",
+            "example": {
+              "status": 400,
+              "error": "A user with this email exists"
+            }
+          }
+        }
+      }
+    },
+    "/auth/signin": {
+      "post": {
+        "summary": "Sign in",
+        "description": "Logs in user",
+        "tags": [
+          "Authentication"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "description": "User object",
+            "schema": {
+              "$ref": "#/definitions/signinRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful login",
+            "schema": {
+              "$ref": "#/definitions/signupResponse"
+            }
+          },
+          "400": {
+            "description": "Invalid login credentials",
+            "example": {
+              "status": 400,
+              "error": "Invalid login credentials"
+            }
+          }
+        }
+      }
+    },
+    "/loans": {
+      "get": {
+        "summary": "Get all loan applications",
+        "description": "Returns all loan applications",
+        "tags": [
+          "Admin"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Loans retrieved successfully",
+            "example": {
+              "status": 200,
+              "data": [
+                {
+                  "id": 1,
+                  "user": "johndoe@gmail.com",
+                  "createdOn": "2019-05-12T19:58:46.725Z",
+                  "status": "pending",
+                  "repaid": false,
+                  "tenor": 5,
+                  "amount": 100,
+                  "paymentInstallment": 30,
+                  "balance": 150,
+                  "interest": 50
+                }
+              ]
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create loan application",
+        "description": "Creates a new loan application",
+        "tags": [
+          "Users"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "description": "User object",
+            "schema": {
+              "$ref": "#/definitions/createLoanRequest"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Loan created successfully",
+            "example": {
+              "status": 201,
+              "data": [
+                {
+                  "id": 1,
+                  "user": "johndoe@gmail.com",
+                  "createdOn": "2019-05-12T19:58:46.725Z",
+                  "status": "pending",
+                  "repaid": false,
+                  "tenor": 5,
+                  "amount": 100,
+                  "paymentInstallment": 30,
+                  "balance": 150,
+                  "interest": 50
+                }
+              ]
+            }
+          },
+          "400": {
+            "description": "Unsettled loan exists",
+            "example": {
+              "status": 400,
+              "error": "You have an unsettled loan"
+            }
+          }
+        }
+      }
+    },
+    "/loans/?status=approved&repaid=true": {
+      "get": {
+        "summary": "Get repaid loans",
+        "description": "Returns all repaid loans",
+        "tags": [
+          "Admin"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "status",
+            "type": "string",
+            "description": "Loan status"
+          },
+          {
+            "in": "query",
+            "name": "repaid",
+            "type": "string",
+            "description": "Boolean (true or false)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Repaid loans retrieved successfully",
+            "example": {
+              "status": 200,
+              "data": [
+                {
+                  "id": 1,
+                  "user": "johndoe@gmail.com",
+                  "createdOn": "2019-05-12T19:58:46.725Z",
+                  "status": "approved",
+                  "repaid": true,
+                  "tenor": 5,
+                  "amount": 100,
+                  "paymentInstallment": 30,
+                  "balance": 150,
+                  "interest": 50
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    "/loans/?status=approved&repaid=false": {
+      "get": {
+        "summary": "Get current loans",
+        "description": "Returns all current loans (Not repaid)",
+        "tags": [
+          "Admin"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "status",
+            "type": "string",
+            "description": "Loan status"
+          },
+          {
+            "in": "query",
+            "name": "repaid",
+            "type": "string",
+            "description": "Boolean (true or false)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Current loans retrieved successfully",
+            "example": {
+              "status": 200,
+              "data": [
+                {
+                  "id": 1,
+                  "user": "johndoe@gmail.com",
+                  "createdOn": "2019-05-12T19:58:46.725Z",
+                  "status": "approved",
+                  "repaid": false,
+                  "tenor": 5,
+                  "amount": 100,
+                  "paymentInstallment": 30,
+                  "balance": 150,
+                  "interest": 50
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    "/loans/{id}": {
+      "patch": {
+        "summary": "Update loan status",
+        "description": "Returns loan with updated status",
+        "tags": [
+          "Admin"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "type": "number",
+            "required": true,
+            "description": "Loan ID"
+          },
+          {
+            "in": "body",
+            "name": "status",
+            "type": "string",
+            "required": true,
+            "description": "Loan Status",
+            "example": "approved/rejected"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Loan",
+            "example": {
+              "status": 200,
+              "data": [
+                {
+                  "id": 1,
+                  "user": "johndoe@gmail.com",
+                  "createdOn": "2019-05-12T19:58:46.725Z",
+                  "status": "approved",
+                  "repaid": false,
+                  "tenor": 5,
+                  "amount": 100,
+                  "paymentInstallment": 30,
+                  "balance": 150,
+                  "interest": 50
+                }
+              ]
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Get specific loan",
+        "description": "Returns a specific loan",
+        "tags": [
+          "Admin"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "type": "number",
+            "required": true,
+            "description": "Loan ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Loan",
+            "example": {
+              "status": 200,
+              "data": [
+                {
+                  "id": 1,
+                  "user": "johndoe@gmail.com",
+                  "createdOn": "2019-05-12T19:58:46.725Z",
+                  "status": "approved",
+                  "repaid": false,
+                  "tenor": 5,
+                  "amount": 100,
+                  "paymentInstallment": 30,
+                  "balance": 150,
+                  "interest": 50
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    "/loans/{id}/repayments": {
+      "post": {
+        "summary": "Create loan repayment record",
+        "description": "Creates a new loan repayment record",
+        "tags": [
+          "Admin"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "description": "User object",
+            "schema": {
+              "$ref": "#/definitions/repayLoanRequest"
+            }
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "type": "number",
+            "required": true,
+            "description": "Loan ID"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Loan repaid successfully",
+            "example": {
+              "status": 201,
+              "data": [
+                {
+                  "id": 1,
+                  "loanId": 1,
+                  "paidAmount": 30,
+                  "user": "johndoe@gmail.com",
+                  "createdOn": "2019-05-12T19:58:46.725Z",
+                  "amount": 100,
+                  "paymentInstallment": 30,
+                  "balance": 120
+                }
+              ]
+            }
+          },
+          "400": {
+            "description": "Error",
+            "example": {
+              "status": 400,
+              "error": "string"
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Get loan repayments",
+        "description": "Returns loan repayments",
+        "tags": [
+          "Users"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "type": "number",
+            "required": true,
+            "description": "Loan ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Loan repayments",
+            "example": {
+              "status": 200,
+              "data": [
+                {
+                  "id": 1,
+                  "loanId": 1,
+                  "paidAmount": 30,
+                  "user": "johndoe@gmail.com",
+                  "createdOn": "2019-05-12T19:58:46.725Z",
+                  "amount": 100,
+                  "paymentInstallment": 30,
+                  "balance": 120
+                },
+                {
+                  "id": 1,
+                  "loanId": 1,
+                  "paidAmount": 30,
+                  "user": "johndoe@gmail.com",
+                  "createdOn": "2019-05-12T19:58:46.725Z",
+                  "amount": 100,
+                  "paymentInstallment": 30,
+                  "balance": 90
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    "/users/{email}/verify": {
+      "patch": {
+        "summary": "Update loan status",
+        "description": "Returns loan with updated status",
+        "tags": [
+          "Admin"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "email",
+            "type": "string",
+            "required": true,
+            "description": "Client email"
+          },
+          {
+            "in": "body",
+            "name": "status",
+            "type": "string",
+            "required": true,
+            "description": "User Status",
+            "example": "verified/unverified"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Loan",
+            "example": {
+              "status": 200,
+              "data": [
+                {
+                  "id": 1,
+                  "email": "johndoe@gmail.com",
+                  "firstName": "John",
+                  "lastName": "Doe",
+                  "address": "21 Vicarage road Watford",
+                  "status": "verified",
+                  "createdOn": "2019-05-12T19:58:46.725Z"
+                }
+              ]
+            }
+          },
+          "404": {
+            "description": "Email does not exist",
+            "example": {
+              "status": 404,
+              "error": "Client does not exist"
+            }
+          }
+        }
+      }
+    },
+    "/auth/forgot_password": {
+      "post": {
+        "summary": "Reset password",
+        "description": "Sends a reset token to user email",
+        "tags": [
+          "Authentication"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "email",
+            "required": true,
+            "description": "User email",
+            "example": {
+              "email": "johndoe@gmail.com"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Password reset mail sent",
+            "example": {
+              "status": 200,
+              "message": "Password reset mail sent"
+            }
+          },
+          "404": {
+            "description": "Email does not exist",
+            "example": {
+              "status": 404,
+              "error": "Email does not exist"
+            }
+          }
+        }
+      }
+    },
+    "/auth/reset_password/{token}": {
+      "post": {
+        "summary": "Reset password",
+        "description": "Sends a reset token to user email",
+        "tags": [
+          "Authentication"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "description": "New password",
+            "example": {
+              "password": "pass",
+              "confirmPassword": "pass"
+            }
+          },
+          {
+            "in": "path",
+            "name": "token",
+            "required": true,
+            "type": "string",
+            "description": "Reset token"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Password reset mail sent",
+            "example": {
+              "status": 200,
+              "message": "Password reset successful"
+            }
+          },
+          "400": {
+            "description": "Invalid reset token",
+            "example": {
+              "status": 400,
+              "error": "Expired reset link"
+            }
+          },
+          "404": {
+            "description": "Invalid email",
+            "example": {
+              "status": 404,
+              "error": "User not found"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "signupRequest": {
+      "title": "User Sign Up Request",
+      "type": "object",
+      "properties": {
+        "firstName": {
+          "type": "string"
+        },
+        "lastName": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "address": {
+          "type": "string"
+        }
+      },
+      "example": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "email": "john.doe@gmail.com",
+        "password": "qwerty",
+        "address": "21, Vicarage Road Watford"
+      },
+      "required": [
+        "firstName, lastName, email, password, address"
+      ]
+    },
+    "signinRequest": {
+      "title": "User Sign in Request",
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        }
+      },
+      "example": {
+        "email": "john.doe@gmail.com",
+        "password": "qwerty"
+      },
+      "required": [
+        "email, password"
+      ]
+    },
+    "createLoanRequest": {
+      "title": "Create new loan request",
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "number"
+        },
+        "tenor": {
+          "type": "number"
+        }
+      },
+      "example": {
+        "amount": 100,
+        "tenor": 5
+      },
+      "required": [
+        "amount, tenor"
+      ]
+    },
+    "repayLoanRequest": {
+      "title": "Repay loan request",
+      "type": "object",
+      "properties": {
+        "paidAmount": {
+          "type": "number"
+        }
+      },
+      "example": {
+        "paidAmount": 30
+      },
+      "required": [
+        "amount"
+      ]
+    },
+    "signupResponse": {
+      "title": "Response",
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "number",
+          "example": 201
+        },
+        "data": {
+          "type": "object",
+          "properties": {
+            "token": {
+              "type": "string",
+              "example": "ekkjigu65799..."
+            },
+            "id": {
+              "type": "number",
+              "example": 10
+            },
+            "firstName": {
+              "type": "string",
+              "example": "John"
+            },
+            "lastName": {
+              "type": "string",
+              "example": "Doe"
+            },
+            "email": {
+              "type": "string",
+              "example": "johndoe@gmail.com"
+            }
+          }
+        }
+      }
+    }
+  }
+}

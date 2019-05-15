@@ -1,10 +1,13 @@
 import { Router } from 'express';
+import swaggerUi from 'swagger-ui-express';
+import swaggerDoc from '../swagger.json';
 import loansController from '../controllers/loansController';
 import authController from '../controllers/authController';
 import validation from '../middlewares/validation';
 import verify from '../middlewares/verify';
 
 const router = Router();
+router.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDoc));
 router.get('/', (req, res) => {
   res.status(200).json({
     status: 200,

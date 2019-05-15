@@ -64,8 +64,8 @@ describe('Loan Tests', () => {
         .post('/api/v1/loans')
         .set('x-access-token', userToken)
         .send({
-          tenor: '5',
-          amount: '1500.00',
+          tenor: 5,
+          amount: 1500.00,
         })
         .end((err, res) => {
           expect(res.status).to.equal(201);
@@ -78,8 +78,8 @@ describe('Loan Tests', () => {
         .post('/api/v1/loans')
         .set('x-access-token', userToken)
         .send({
-          tenor: '5',
-          amount: '1500.00',
+          tenor: 5,
+          amount: 1500.00,
         })
         .end((err, res) => {
           expect(res.status).to.equal(400);
@@ -94,7 +94,7 @@ describe('Loan Tests', () => {
         .set('x-access-token', userToken)
         .send({
           tenor: '',
-          amount: '1500.00',
+          amount: 1500.00,
         })
         .end((err, res) => {
           expect(res.status).to.equal(400);
@@ -108,8 +108,8 @@ describe('Loan Tests', () => {
         .post('/api/v1/loans')
         .set('x-access-token', userToken)
         .send({
-          tenor: '13',
-          amount: '1500.00',
+          tenor: 13,
+          amount: 1500.00,
         })
         .end((err, res) => {
           expect(res.status).to.equal(400);
@@ -123,7 +123,7 @@ describe('Loan Tests', () => {
         .post('/api/v1/loans')
         .set('x-access-token', userToken)
         .send({
-          tenor: '3',
+          tenor: 3,
           amount: '',
         })
         .end((err, res) => {
@@ -138,7 +138,7 @@ describe('Loan Tests', () => {
         .post('/api/v1/loans')
         .set('x-access-token', userToken)
         .send({
-          tenor: '3',
+          tenor: 3,
           amount: '150A.00',
         })
         .end((err, res) => {
