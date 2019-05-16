@@ -19,7 +19,7 @@ const createLoan = async (req, res) => {
   const paymentInstallment = Number(((amount + interest) / tenor).toFixed(2));
   const balance = Number((amount + interest).toFixed(2));
   try {
-    const loanResult = await pool.query('SELECT * FROM loans WHERE user_email = $1 AND repaid = false', [email]);
+    const loanResult = await pool.query('SELECT * FROM loans WHERE "userEmail" = $1 AND repaid = false', [email]);
     if (loanResult.rows[0]) {
       return res.status(400).json({
         status: 400,
@@ -27,7 +27,7 @@ const createLoan = async (req, res) => {
       });
     }
     const query = {
-      text: 'INSERT INTO loans (user_email, tenor, amount, payment_installment, balance, interest) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
+      text: 'INSERT INTO loans ("userEmail", tenor, amount, "paymentInstallment", balance, interest) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id, "userEmail", status, repaid, tenor, amount::float, "paymentInstallment"::float, balance::float, interest::float, "createdOn"',
       values: [email, tenor, amount, paymentInstallment, balance, interest],
     };
     const result = await pool.query(query);
@@ -56,7 +56,7 @@ const getAllLoans = async (req, res) => {
   try {
     if (status === 'approved' && (repaid === 'true' || repaid === 'false')) {
       const query = {
-        text: 'SELECT * FROM loans WHERE status = $1 AND repaid = $2',
+        text: 'SELECT id, "userEmail", status, repaid, tenor, amount::float, "paymentInstallment"::float, balance::float, interest::float, "createdOn" FROM loans WHERE status = $1 AND repaid = $2',
         values: [status, repaid],
       };
       const result = await pool.query(query);
@@ -65,7 +65,7 @@ const getAllLoans = async (req, res) => {
         data: result.rows,
       });
     }
-    const result = await pool.query('SELECT * FROM loans');
+    const result = await pool.query('SELECT id, "userEmail", status, repaid, tenor, amount::float, "paymentInstallment"::float, balance::float, interest::float, "createdOn" FROM loans');
     console.log(result);
     return res.json({
       status: 200,
@@ -90,7 +90,7 @@ const getAllLoans = async (req, res) => {
 const getSpecificLoan = async (req, res) => {
   const loanId = parseInt(req.params.id, 10);
   const query = {
-    text: 'SELECT * FROM loans WHERE id = $1',
+    text: 'SELECT id, "userEmail", status, repaid, tenor, amount::float, "paymentInstallment"::float, balance::float, interest::float, "createdOn" FROM loans WHERE id = $1',
     values: [loanId],
   };
   try {
@@ -120,27 +120,38 @@ const getSpecificLoan = async (req, res) => {
  * @param {object} res Response Object
  * @returns {object} JSON Response
  */
-const updateLoanStatus = (req, res) => {
+const updateLoanStatus = async (req, res) => {
   const loanId = parseInt(req.params.id, 10);
   console.log(loanId);
   const { status } = req.body;
 
-  const loan = Loans.find(item => item.id === loanId);
-  if (!loan) {
-    return res.status(400).json({
-      status: 400,
-      error: 'Invalid id parameter',
+  try {
+    const loan = await pool.query('SELECT * FROM loans WHERE id = $1 ', [loanId]);
+    if (!loan.rows[0]) {
+      return res.status(404).json({
+        status: 404,
+        error: 'Loan does not exist',
+      });
+    }
+    // update loan status
+    const query = {
+      text: 'UPDATE loans SET status = $1 WHERE id = $2 RETURNING id, "userEmail", status, repaid, tenor, amount::float, "paymentInstallment"::float, balance::float, interest::float, "createdOn"',
+      values: [status, loanId],
+    };
+    const updatedLoan = await pool.query(query);
+    // get user object and send notification mail
+    const user = await pool.query('SELECT * FROM users WHERE email = $1', [updatedLoan.rows[0].userEmail]);
+    mailer.sendLoanNotificationMail(user.rows[0], status);
+    return res.json({
+      status: 200,
+      data: updatedLoan.rows[0],
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: 500,
+      error: 'Internal server error',
     });
   }
-  // update loan status
-  loan.status = status;
-  // get user and send notification mail
-  const user = Users.find(item => item.email === loan.user);
-  mailer.sendLoanNotificationMail(user, status);
-  return res.json({
-    status: 200,
-    data: loan,
-  });
 };
 
 /**
