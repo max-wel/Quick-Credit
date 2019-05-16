@@ -2,6 +2,7 @@ import Loans from '../models/loans';
 import Repayments from '../models/repayments';
 import Users from '../models/users';
 import mailer from '../helpers/mailer';
+import pool from '../db/config';
 
 /**
  * @function createLoan
@@ -10,41 +11,38 @@ import mailer from '../helpers/mailer';
  * @param {object} res Response Object
  * @returns {object} JSON Response
  */
-const createLoan = (req, res) => {
+const createLoan = async (req, res) => {
   const { email } = req.user;
   const amount = Number(req.body.amount);
   const tenor = Number(req.body.tenor);
   const interest = Number(((5 / 100) * amount).toFixed(2));
   const paymentInstallment = Number(((amount + interest) / tenor).toFixed(2));
+  const balance = Number((amount + interest).toFixed(2));
 
-  const newLoan = {
-    id: Loans.length + 1,
-    user: email,
-    createdOn: new Date(),
-    status: 'pending',
-    repaid: false,
-    tenor,
-    amount,
-    paymentInstallment,
-    balance: Number((amount + interest).toFixed(2)),
-    interest,
-  };
-
-  const existingLoans = Loans.filter(loan => loan.user === email);
-
-  const repaidLoan = existingLoans.filter(loan => loan.repaid === false);
-  if (repaidLoan.length !== 0) {
-    return res.status(400).json({
-      status: 400,
-      error: 'You have an unsettled loan',
+  try {
+    const loanResult = await pool.query('SELECT * FROM loans WHERE user_email = $1 AND repaid = false', [email]);
+    if (loanResult.rows[0]) {
+      return res.status(400).json({
+        status: 400,
+        error: 'You have an unsettled loan',
+      });
+    }
+    const query = {
+      text: 'INSERT INTO loans (user_email, tenor, amount, payment_installment, balance, interest) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
+      values: [email, tenor, amount, paymentInstallment, balance, interest],
+    };
+    const result = await pool.query(query);
+    return res.status(201).json({
+      status: 201,
+      data: result.rows[0],
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      status: 500,
+      error: 'Internal server error',
     });
   }
-
-  Loans.push(newLoan);
-  return res.status(201).json({
-    status: 201,
-    data: newLoan,
-  });
 };
 
 /**
