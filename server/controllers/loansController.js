@@ -54,27 +54,38 @@ const createLoan = async (req, res) => {
  */
 const getAllLoans = async (req, res) => {
   const { status, repaid } = req.query;
-
-  if (status === 'approved' && repaid === 'false') {
-    const currentLoans = Loans.filter(loan => loan.status === status && !loan.repaid);
+  try {
+    if (status === 'approved' && repaid === 'false') {
+      const query = {
+        text: 'SELECT * FROM loans WHERE status = $1 AND repaid = $2',
+        values: [status, repaid],
+      };
+      const result = await pool.query(query);
+      return res.json({
+        status: 200,
+        data: result.rows,
+      });
+    }
+    if (status === 'approved' && repaid === 'true') {
+      const repaidLoans = Loans.filter(loan => loan.status === status && loan.repaid);
+      return res.json({
+        status: 200,
+        data: repaidLoans,
+      });
+    }
+ 
+    const result = await pool.query('SELECT * FROM loans');
     return res.json({
       status: 200,
-      data: currentLoans,
+      data: result.rows,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      status: 500,
+      error: 'Internal server error',
     });
   }
-  if (status === 'approved' && repaid === 'true') {
-    const repaidLoans = Loans.filter(loan => loan.status === status && loan.repaid);
-    return res.json({
-      status: 200,
-      data: repaidLoans,
-    });
-  }
-
-  const result = await pool.query('SELECT * FROM loans');
-  return res.json({
-    status: 200,
-    data: result.rows,
-  });
 };
 
 /**
