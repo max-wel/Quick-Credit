@@ -52,7 +52,7 @@ const createLoan = async (req, res) => {
  * @param {object} res Response Object
  * @returns {object} JSON Response
  */
-const getAllLoans = (req, res) => {
+const getAllLoans = async (req, res) => {
   const { status, repaid } = req.query;
 
   if (status === 'approved' && repaid === 'false') {
@@ -70,9 +70,10 @@ const getAllLoans = (req, res) => {
     });
   }
 
+  const result = await pool.query('SELECT * FROM loans');
   return res.json({
     status: 200,
-    data: Loans,
+    data: result.rows,
   });
 };
 
