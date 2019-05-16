@@ -55,7 +55,7 @@ const createLoan = async (req, res) => {
 const getAllLoans = async (req, res) => {
   const { status, repaid } = req.query;
   try {
-    if (status === 'approved' && repaid === 'false') {
+    if (status === 'approved' && (repaid === 'true' || repaid === 'false')) {
       const query = {
         text: 'SELECT * FROM loans WHERE status = $1 AND repaid = $2',
         values: [status, repaid],
@@ -66,14 +66,6 @@ const getAllLoans = async (req, res) => {
         data: result.rows,
       });
     }
-    if (status === 'approved' && repaid === 'true') {
-      const repaidLoans = Loans.filter(loan => loan.status === status && loan.repaid);
-      return res.json({
-        status: 200,
-        data: repaidLoans,
-      });
-    }
- 
     const result = await pool.query('SELECT * FROM loans');
     return res.json({
       status: 200,
