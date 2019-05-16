@@ -18,7 +18,6 @@ const createLoan = async (req, res) => {
   const interest = Number(((5 / 100) * amount).toFixed(2));
   const paymentInstallment = Number(((amount + interest) / tenor).toFixed(2));
   const balance = Number((amount + interest).toFixed(2));
-
   try {
     const loanResult = await pool.query('SELECT * FROM loans WHERE user_email = $1 AND repaid = false', [email]);
     if (loanResult.rows[0]) {
@@ -67,6 +66,7 @@ const getAllLoans = async (req, res) => {
       });
     }
     const result = await pool.query('SELECT * FROM loans');
+    console.log(result);
     return res.json({
       status: 200,
       data: result.rows,
@@ -87,19 +87,30 @@ const getAllLoans = async (req, res) => {
  * @param {object} res Response Object
  * @returns {object} JSON Response
  */
-const getSpecificLoan = (req, res) => {
+const getSpecificLoan = async (req, res) => {
   const loanId = parseInt(req.params.id, 10);
-  const loan = Loans.find(item => item.id === loanId);
-  if (!loan) {
-    return res.status(404).json({
-      status: 404,
-      error: 'No loan found',
+  const query = {
+    text: 'SELECT * FROM loans WHERE id = $1',
+    values: [loanId],
+  };
+  try {
+    const result = await pool.query(query);
+    if (!result.rows[0]) {
+      return res.status(404).json({
+        status: 404,
+        error: 'No loan found',
+      });
+    }
+    return res.json({
+      status: 200,
+      data: result.rows[0],
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: 500,
+      error: 'Internal server error',
     });
   }
-  return res.json({
-    status: 200,
-    data: loan,
-  });
 };
 
 /**
