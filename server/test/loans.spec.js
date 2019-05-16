@@ -260,7 +260,7 @@ describe('Loan Tests', () => {
         .set('x-access-token', adminToken)
         .send({ status: 'approved' })
         .end((err, res) => {
-          expect(res.status).to.equal(400);
+          expect(res.status).to.equal(404);
           expect(res.body).to.have.property('error');
           done();
         });

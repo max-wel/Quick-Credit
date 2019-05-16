@@ -25,18 +25,18 @@ const userSignup = async (req, res) => {
       });
     }
     const query = {
-      text: 'INSERT INTO users (email, first_name, last_name, password, address) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+      text: 'INSERT INTO users (email, "firstName", "lastName", password, address) VALUES ($1, $2, $3, $4, $5) RETURNING *',
       values: [email, firstName, lastName, passwordEncrypt.hashPassword(password), address],
     };
     const result = await pool.query(query);
-    const token = generateToken.signToken({ email: result.rows[0].email, isAdmin: result.rows[0].is_admin });
+    const token = generateToken.signToken({ email: result.rows[0].email, isAdmin: result.rows[0].isAdmin });
     return res.status(201).json({
       status: 201,
       data: {
         token,
         id: result.rows[0].id,
-        firstName: result.rows[0].first_name,
-        lastName: result.rows[0].last_name,
+        firstName: result.rows[0].firstName,
+        lastName: result.rows[0].lastName,
         email: result.rows[0].email,
       },
     });
@@ -77,14 +77,14 @@ const userSignin = async (req, res) => {
         error: 'Invalid login credentials',
       });
     }
-    const token = generateToken.signToken({ email: result.rows[0].email, isAdmin: result.rows[0].is_admin });
+    const token = generateToken.signToken({ email: result.rows[0].email, isAdmin: result.rows[0].isAdmin });
     return res.json({
       status: 200,
       data: {
         token,
         id: result.rows[0].id,
-        firstName: result.rows[0].first_name,
-        lastName: result.rows[0].last_name,
+        firstName: result.rows[0].firstName,
+        lastName: result.rows[0].lastName,
         email: result.rows[0].email,
       },
     });
