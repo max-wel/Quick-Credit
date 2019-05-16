@@ -5,7 +5,7 @@ import Users from '../models/users';
 import app from '../app';
 
 const validUser = {
-  email: 'memphis@gmail.com',
+  email: 'rigatoni@gmail.com',
   firstName: 'Memphis',
   lastName: 'Depay',
   password: 'Lyonnais',

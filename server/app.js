@@ -23,6 +23,17 @@ app.use((req, res) => {
     error: 'Resource not found',
   });
 });
+// when app goes into error mode
+app.use((err, req, res, next) => {
+  if (req.app.get('env') === 'development') {
+    console.log(err);
+  }
+  return res.status(500).json({
+    status: 500,
+    error: 'Internal server error',
+  });
+});
+
 app.listen(port, () => {
   console.log(`Server started on port ${port}`);
 });

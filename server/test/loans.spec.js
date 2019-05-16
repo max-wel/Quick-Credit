@@ -4,7 +4,7 @@ import app from '../app';
 import pool from '../db/config';
 
 const user = {
-  email: 'memphis@gmail.com',
+  email: 'rigatoni@gmail.com',
   password: 'Lyonnais',
 };
 const admin = {
@@ -343,7 +343,7 @@ describe('Loan Tests', () => {
   describe('User GET loan repayment history', () => {
     it('should return loan repayment history', (done) => {
       request(app)
-        .get('/api/v1/loans/6/repayments')
+        .get('/api/v1/loans/2/repayments')
         .set('x-access-token', userToken)
         .end((err, res) => {
           expect(res.status).to.equal(200);
@@ -364,7 +364,7 @@ describe('Loan Tests', () => {
     });
     it('should return an error if loan does not belong to user', (done) => {
       request(app)
-        .get('/api/v1/loans/2/repayments')
+        .get('/api/v1/loans/1/repayments')
         .set('x-access-token', userToken)
         .end((err, res) => {
           expect(res.status).to.equal(403);
