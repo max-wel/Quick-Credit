@@ -4,11 +4,18 @@ import jwt from 'jsonwebtoken';
 import Users from '../models/users';
 import app from '../app';
 
-const validUser = {
+const validUser1 = {
   email: 'rigatoni@gmail.com',
   firstName: 'Memphis',
   lastName: 'Depay',
   password: 'Lyonnais',
+  address: '21, Bode Thomas street, Amsterdam',
+};
+const validUser2 = {
+  email: 'pasta@gmail.com',
+  firstName: 'Chandler',
+  lastName: 'Ross',
+  password: 'blurryface',
   address: '21, Bode Thomas street, Amsterdam',
 };
 
@@ -40,17 +47,25 @@ describe('POST user signup', () => {
   it('should create a new user', (done) => {
     request(app)
       .post('/api/v1/auth/signup')
-      .send(validUser)
+      .send(validUser1)
       .end((err, res) => {
         expect(res.status).to.equal(201);
         expect(res.body).to.have.property('data');
-        done();
+
+        request(app)
+          .post('/api/v1/auth/signup')
+          .send(validUser2)
+          .end((err1, res1) => {
+            expect(res1.status).to.equal(201);
+            expect(res1.body).to.have.property('data');
+            done();
+          });
       });
   });
   it('should return an error when user tries to signup with an existing email', (done) => {
     request(app)
       .post('/api/v1/auth/signup')
-      .send(validUser)
+      .send(validUser1)
       .end((err, res) => {
         expect(res.status).to.equal(400);
         expect(res.body).to.have.property('error');
@@ -143,7 +158,7 @@ describe('POST user signin', () => {
   it('should signin user', (done) => {
     request(app)
       .post('/api/v1/auth/signin')
-      .send(validUser)
+      .send(validUser1)
       .end((err, res) => {
         expect(res.status).to.equal(200);
         expect(res.body).to.have.property('data');
@@ -154,7 +169,7 @@ describe('POST user signin', () => {
     request(app)
       .post('/api/v1/auth/signin')
       .send({
-        email: 'invaliduser@gmail.com',
+        email: 'invalidUser1@gmail.com',
         password: 'Lyonnais',
       })
       .end((err, res) => {
@@ -237,13 +252,13 @@ describe('User forgot password test', () => {
 
 describe('User reset password test', () => {
   const user = Users[0];
-  const validUserResetToken = jwt.sign({ email: user.email }, user.password, { expiresIn: '1h' });
-  const invalidUserResetToken = jwt.sign({ email: 'non@gmail.com' }, user.password, { expiresIn: '1h' });
+  const validUser1ResetToken = jwt.sign({ email: user.email }, user.password, { expiresIn: '1h' });
+  const invalidUser1ResetToken = jwt.sign({ email: 'non@gmail.com' }, user.password, { expiresIn: '1h' });
   const invalidToken = jwt.sign({ email: user.email }, 'fake-secret', { expiresIn: '1h' });
 
   it('should return an error when passed non-existing user', (done) => {
     request(app)
-      .post(`/api/v1/auth/reset_password/${invalidUserResetToken}`)
+      .post(`/api/v1/auth/reset_password/${invalidUser1ResetToken}`)
       .send({
         password: 'new-pass',
         confirmPassword: 'new-pass',
@@ -269,7 +284,7 @@ describe('User reset password test', () => {
   });
   it('should return an error when password is empty', (done) => {
     request(app)
-      .post(`/api/v1/auth/reset_password/${validUserResetToken}`)
+      .post(`/api/v1/auth/reset_password/${validUser1ResetToken}`)
       .send({
         password: '',
         confirmPassword: 'new-pass',
@@ -282,7 +297,7 @@ describe('User reset password test', () => {
   });
   it('should return an error when password is not equal to confirm-password', (done) => {
     request(app)
-      .post(`/api/v1/auth/reset_password/${validUserResetToken}`)
+      .post(`/api/v1/auth/reset_password/${validUser1ResetToken}`)
       .send({
         password: 'new-pass',
         confirmPassword: 'not-new-pass',
@@ -295,7 +310,7 @@ describe('User reset password test', () => {
   });
   it('should reset user password', (done) => {
     request(app)
-      .post(`/api/v1/auth/reset_password/${validUserResetToken}`)
+      .post(`/api/v1/auth/reset_password/${validUser1ResetToken}`)
       .send({
         password: 'new-pass',
         confirmPassword: 'new-pass',
@@ -308,7 +323,7 @@ describe('User reset password test', () => {
   });
   it('should return an error when valid token is used more than once', (done) => {
     request(app)
-      .post(`/api/v1/auth/reset_password/${validUserResetToken}`)
+      .post(`/api/v1/auth/reset_password/${validUser1ResetToken}`)
       .send({
         password: 'new-pass',
         confirmPassword: 'new-pass',

@@ -138,7 +138,8 @@ const updateLoanValidator = (req, res, next) => {
  */
 const repayLoanValidator = (req, res, next) => {
   const { paidAmount } = req.body;
-  const regex = /^\d+(\.\d{2})?$/;
+  const regex = /^\d+(\.\d{0,2})?$/;
+  console.log(paidAmount.toString());
   if (!regex.test(paidAmount)) {
     return res.status(400).json({
       status: 400,

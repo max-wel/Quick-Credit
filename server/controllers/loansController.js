@@ -1,6 +1,5 @@
 import Loans from '../models/loans';
 import Repayments from '../models/repayments';
-import Users from '../models/users';
 import mailer from '../helpers/mailer';
 import pool from '../db/config';
 
@@ -161,53 +160,64 @@ const updateLoanStatus = async (req, res) => {
  * @param {object} res Response Object
  * @returns {object} JSON Response
  */
-const repayLoan = (req, res) => {
+const repayLoan = async (req, res) => {
   const loanId = parseInt(req.params.id, 10);
   const paidAmount = Number(req.body.paidAmount);
 
-  const loan = Loans.find(item => item.id === loanId);
-  if (!loan) {
-    return res.status(400).json({
-      status: 400,
-      error: 'Invalid id parameter',
+  try {
+    const loan = await pool.query('SELECT id, "userEmail", status, repaid, tenor, amount::float, "paymentInstallment"::float, balance::float, interest::float, "createdOn" FROM loans WHERE id = $1', [loanId]);
+    if (loan.rowCount < 1) {
+      return res.status(404).json({
+        status: 404,
+        error: 'Loan does not exist',
+      });
+    }
+    // check if loan has been approved
+    if (loan.rows[0].status !== 'approved') {
+      return res.status(400).json({
+        status: 400,
+        error: 'Loan is not approved',
+      });
+    }
+    // check if loan has been repaid
+    if (loan.rows[0].repaid) {
+      return res.status(400).json({
+        status: 400,
+        error: 'Loan already repaid',
+      });
+    }
+    // check if paidAmount exceeds balance
+    if (paidAmount > loan.rows[0].balance) {
+      return res.status(400).json({
+        status: 400,
+        error: 'Paid amount exceeds current balance',
+      });
+    }
+    // compute new balancce
+    const newBalance = Number((loan.rows[0].balance - paidAmount).toFixed(2));
+    // update balance
+    const updatedLoan = await pool.query('UPDATE loans SET balance = $1 WHERE id = $2 RETURNING amount::float, "paymentInstallment"::float', [newBalance, loanId]);
+    // update repaid
+    if (newBalance === 0) {
+      await pool.query('UPDATE loans SET repaid = $1 WHERE id = $2', [true, loanId]);
+    }
+    // create repayment record
+    const query = {
+      text: 'INSERT INTO repayments ("loanId", "paidAmount", balance) VALUES ($1, $2, $3) RETURNING id, "loanId", "createdOn", "paidAmount"::float, balance::float',
+      values: [loanId, paidAmount, newBalance],
+    };
+    const result = await pool.query(query);
+    const repayment = { ...result.rows[0], ...updatedLoan.rows[0] };
+    return res.status(201).json({
+      status: 201,
+      data: repayment,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: 500,
+      error: 'Internal server error',
     });
   }
-  // check if loan has been approved
-  if (loan.status !== 'approved') {
-    return res.status(400).json({
-      status: 400,
-      error: 'Loan is not approved',
-    });
-  }
-  // check if loan has been repaid
-  if (loan.repaid) {
-    return res.status(400).json({
-      status: 400,
-      error: 'Loan already repaid',
-    });
-  }
-  // compute new balance
-  const newBalance = Number((loan.balance - paidAmount).toFixed(2));
-  loan.balance = newBalance;
-  if (newBalance === 0) {
-    loan.repaid = true;
-  }
-  // create repayment record
-  const repayment = {
-    id: Repayments.length + 1,
-    loanId,
-    createdOn: new Date(),
-    paidAmount,
-    amount: loan.amount,
-    monthlyInstallment: loan.paymentInstallment,
-    balance: loan.balance,
-  };
-  Repayments.push(repayment);
-
-  return res.status(201).json({
-    status: 201,
-    data: repayment,
-  });
 };
 
 /**

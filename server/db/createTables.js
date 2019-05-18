@@ -26,6 +26,7 @@ const loansTableQuery = `CREATE TABLE IF NOT EXISTS loans (
 const repaymentsTableQuery = `CREATE TABLE IF NOT EXISTS repayments (
   id SERIAL PRIMARY KEY, 
   "loanId" INTEGER REFERENCES loans(id), 
+  "paidAmount" NUMERIC(20,2) NOT NULL,
   balance NUMERIC(20,2) NOT NULL, 
   "createdOn" TIMESTAMP WITH TIME ZONE DEFAULT NOW()
   );`;
