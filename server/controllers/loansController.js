@@ -168,7 +168,7 @@ const repayLoan = async (req, res) => {
     const loan = await pool.query('SELECT id, "userEmail", status, repaid, tenor, amount::float, "paymentInstallment"::float, balance::float, interest::float, "createdOn" FROM loans WHERE id = $1', [loanId]);
     if (loan.rowCount < 1) {
       return res.status(404).json({
-        status: 400,
+        status: 404,
         error: 'Loan does not exist',
       });
     }
@@ -196,26 +196,18 @@ const repayLoan = async (req, res) => {
     // compute new balancce
     const newBalance = Number((loan.rows[0].balance - paidAmount).toFixed(2));
     // update balance
-    const updatedLoan = await pool.query('UPDATE loans SET balance = $1 WHERE id = $2 RETURNING amount::float, paymentInstallment::float', [newBalance, loanId]);
+    const updatedLoan = await pool.query('UPDATE loans SET balance = $1 WHERE id = $2 RETURNING amount::float, "paymentInstallment"::float', [newBalance, loanId]);
     // update repaid
     if (newBalance === 0) {
       await pool.query('UPDATE loans SET repaid = $1 WHERE id = $2', [true, loanId]);
     }
     // create repayment record
     const query = {
-      text: 'INSERT INTO repayments ("loanId", "paidAmount", balance) VALUES ($1, $2) RETURNING id, "loanId", "createdOn", "paidAmount"::float, balance::float',
+      text: 'INSERT INTO repayments ("loanId", "paidAmount", balance) VALUES ($1, $2, $3) RETURNING id, "loanId", "createdOn", "paidAmount"::float, balance::float',
       values: [loanId, paidAmount, newBalance],
     };
     const result = await pool.query(query);
-    const repayment = {
-      id: result.rows[0].id,
-      loanId: result.rows[0].loanId,
-      paidAmount: result.rows[0].paidAmount,
-      balancce: result.rows[0].balance,
-      createdOn: result.rows[0].createdOn,
-      amount: updatedLoan.rows[0].amount,
-      monthlyInstallment: updatedLoan.rows[0].paymentInstallment,
-    };
+    const repayment = { ...result.rows[0], ...updatedLoan.rows[0] };
     return res.status(201).json({
       status: 201,
       data: repayment,
@@ -226,49 +218,6 @@ const repayLoan = async (req, res) => {
       error: 'Internal server error',
     });
   }
-  // const loan = Loans.find(item => item.id === loanId);
-  // if (!loan) {
-  //   return res.status(400).json({
-  //     status: 400,
-  //     error: 'Invalid id parameter',
-  //   });
-  // }
-  // // check if loan has been approved
-  // if (loan.status !== 'approved') {
-  //   return res.status(400).json({
-  //     status: 400,
-  //     error: 'Loan is not approved',
-  //   });
-  // }
-  // // check if loan has been repaid
-  // if (loan.repaid) {
-  //   return res.status(400).json({
-  //     status: 400,
-  //     error: 'Loan already repaid',
-  //   });
-  // }
-  // // compute new balance
-  // const newBalance = Number((loan.balance - paidAmount).toFixed(2));
-  // loan.balance = newBalance;
-  // if (newBalance === 0) {
-  //   loan.repaid = true;
-  // }
-  // // create repayment record
-  // const repayment = {
-  //   id: Repayments.length + 1,
-  //   loanId,
-  //   createdOn: new Date(),
-  //   paidAmount,
-  //   amount: loan.amount,
-  //   monthlyInstallment: loan.paymentInstallment,
-  //   balance: loan.balance,
-  // };
-  // Repayments.push(repayment);
-
-  // return res.status(201).json({
-  //   status: 201,
-  //   data: repayment,
-  // });
 };
 
 /**
