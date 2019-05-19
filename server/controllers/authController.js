@@ -104,23 +104,34 @@ const userSignin = async (req, res) => {
  * @param {object} res Response Object
  * @returns {object} JSON Response
  */
-const verifyClient = (req, res) => {
+const verifyClient = async (req, res) => {
   const { email } = req.params;
   const { status } = req.body;
 
-  const client = Users.find(user => user.email === email);
-  if (!client) {
-    return res.status(404).json({
-      status: 404,
-      error: 'Client does not exist',
+  try {
+    const client = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+    if (!client.rows[0]) {
+      return res.status(404).json({
+        status: 404,
+        error: 'Client does not exist',
+      });
+    }
+    const query = {
+      text: 'UPDATE users SET status = $1 WHERE email = $2 RETURNING *',
+      values: [status, email],
+    };
+    const result = await pool.query(query);
+    return res.json({
+      status: 200,
+      data: result.rows[0],
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      status: 500,
+      error: 'Internal server error',
     });
   }
-  // modify client status
-  client.status = status;
-  return res.json({
-    status: 200,
-    data: client,
-  });
 };
 
 /**
