@@ -65,6 +65,7 @@ describe('Loan Tests', () => {
         .end((err, res) => {
           expect(res.status).to.equal(401);
           expect(res.body).to.have.property('error');
+          expect(res.body.error).to.equal('No token found');
           done();
         });
     });
@@ -75,6 +76,7 @@ describe('Loan Tests', () => {
         .end((err, res) => {
           expect(res.status).to.equal(401);
           expect(res.body).to.have.property('error');
+          expect(res.body.error).to.equal('Invalid token');
           done();
         });
     });
@@ -202,6 +204,7 @@ describe('Loan Tests', () => {
         .end((err, res) => {
           expect(res.status).to.equal(403);
           expect(res.body).to.have.property('error');
+          expect(res.body.error).to.equal('Access forbidden, admin only');
           done();
         });
     });
@@ -250,6 +253,7 @@ describe('Loan Tests', () => {
         .end((err, res) => {
           expect(res.status).to.equal(404);
           expect(res.body).to.have.property('error');
+          expect(res.body.error).to.equal('No loan found');
           done();
         });
     });
@@ -288,6 +292,7 @@ describe('Loan Tests', () => {
         .end((err, res) => {
           expect(res.status).to.equal(404);
           expect(res.body).to.have.property('error');
+          expect(res.body.error).to.equal('Loan does not exist');
           done();
         });
     });
@@ -299,6 +304,7 @@ describe('Loan Tests', () => {
         .end((err, res) => {
           expect(res.status).to.equal(400);
           expect(res.body).to.have.property('error');
+          expect(res.body.error).to.equal('Invalid status');
           done();
         });
     });
@@ -404,7 +410,7 @@ describe('Loan Tests', () => {
   describe('Admin verify client', () => {
     it('should return a verified client', (done) => {
       request(app)
-        .patch('/api/v1/users/maximusekeh@gmail.com/verify')
+        .patch('/api/v1/users/rigatoni@gmail.com/verify')
         .set('x-access-token', adminToken)
         .send({ status: 'verified' })
         .end((err, res) => {
@@ -421,17 +427,19 @@ describe('Loan Tests', () => {
         .end((err, res) => {
           expect(res.status).to.equal(404);
           expect(res.body).to.have.property('error');
+          expect(res.body.error).to.equal('Client does not exist');
           done();
         });
     });
     it('should return an error when passed invalid status', (done) => {
       request(app)
-        .patch('/api/v1/users/memphis@gmail.com/verify')
+        .patch('/api/v1/users/rigatoni@gmail.com/verify')
         .set('x-access-token', adminToken)
         .send({ status: 'qweerty' })
         .end((err, res) => {
           expect(res.status).to.equal(400);
           expect(res.body).to.have.property('error');
+          expect(res.body.error).to.equal('Invalid status');
           done();
         });
     });

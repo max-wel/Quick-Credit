@@ -1,5 +1,3 @@
-import Loans from '../models/loans';
-import Repayments from '../models/repayments';
 import mailer from '../helpers/mailer';
 import pool from '../db/config';
 
