@@ -5,7 +5,7 @@ import pool from '../db/config';
 
 const user1 = {
   email: 'rigatoni@gmail.com',
-  password: 'Lyonnais',
+  password: 'new-pass',
 };
 const user2 = {
   email: 'pasta@gmail.com',

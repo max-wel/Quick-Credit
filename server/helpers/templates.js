@@ -19,9 +19,9 @@ const passwordRecovery = (user, token) => `
       <h2>Quick-Credit</h2>
       <h3 class="username">Hello ${user.firstName},</h3>
       <p class="message">
-      Someone(hopefully you), requested for a password reset for your Quick-Credit account. Kindly click on the button below to reset password.
+      Someone(hopefully you), requested a password reset for your Quick-Credit account. Kindly click on the button below to reset password.
       </p>
-      <a class="reset-btn" href="">
+      <a class="reset-btn" href="https://sneakymaxy.github.io/Quick-Credit/UI/reset-password.html?reset_token=${token}">
         Reset password
       </a>
     </div>
