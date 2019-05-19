@@ -1,14 +1,21 @@
 import { expect } from 'chai';
 import request from 'supertest';
 import jwt from 'jsonwebtoken';
-import Users from '../models/users';
+import pool from '../db/config';
 import app from '../app';
 
-const validUser = {
-  email: 'memphis@gmail.com',
+const validUser1 = {
+  email: 'rigatoni@gmail.com',
   firstName: 'Memphis',
   lastName: 'Depay',
   password: 'Lyonnais',
+  address: '21, Bode Thomas street, Amsterdam',
+};
+const validUser2 = {
+  email: 'pasta@gmail.com',
+  firstName: 'Chandler',
+  lastName: 'Ross',
+  password: 'blurryface',
   address: '21, Bode Thomas street, Amsterdam',
 };
 
@@ -40,20 +47,29 @@ describe('POST user signup', () => {
   it('should create a new user', (done) => {
     request(app)
       .post('/api/v1/auth/signup')
-      .send(validUser)
+      .send(validUser1)
       .end((err, res) => {
         expect(res.status).to.equal(201);
         expect(res.body).to.have.property('data');
-        done();
+
+        request(app)
+          .post('/api/v1/auth/signup')
+          .send(validUser2)
+          .end((err1, res1) => {
+            expect(res1.status).to.equal(201);
+            expect(res1.body).to.have.property('data');
+            done();
+          });
       });
   });
   it('should return an error when user tries to signup with an existing email', (done) => {
     request(app)
       .post('/api/v1/auth/signup')
-      .send(validUser)
+      .send(validUser1)
       .end((err, res) => {
         expect(res.status).to.equal(400);
         expect(res.body).to.have.property('error');
+        expect(res.body.error).to.equal('A user with this email exists');
         done();
       });
   });
@@ -70,6 +86,7 @@ describe('POST user signup', () => {
       .end((err, res) => {
         expect(res.status).to.equal(400);
         expect(res.body).to.have.property('error');
+        expect(res.body.error).to.equal('Email is required');
         done();
       });
   });
@@ -86,6 +103,7 @@ describe('POST user signup', () => {
       .end((err, res) => {
         expect(res.status).to.equal(400);
         expect(res.body).to.have.property('error');
+        expect(res.body.error).to.equal('First name is required');
         done();
       });
   });
@@ -102,6 +120,7 @@ describe('POST user signup', () => {
       .end((err, res) => {
         expect(res.status).to.equal(400);
         expect(res.body).to.have.property('error');
+        expect(res.body.error).to.equal('Last name is required');
         done();
       });
   });
@@ -118,6 +137,7 @@ describe('POST user signup', () => {
       .end((err, res) => {
         expect(res.status).to.equal(400);
         expect(res.body).to.have.property('error');
+        expect(res.body.error).to.equal('Password is required');
         done();
       });
   });
@@ -134,6 +154,7 @@ describe('POST user signup', () => {
       .end((err, res) => {
         expect(res.status).to.equal(400);
         expect(res.body).to.have.property('error');
+        expect(res.body.error).to.equal('Address is required');
         done();
       });
   });
@@ -143,7 +164,7 @@ describe('POST user signin', () => {
   it('should signin user', (done) => {
     request(app)
       .post('/api/v1/auth/signin')
-      .send(validUser)
+      .send(validUser1)
       .end((err, res) => {
         expect(res.status).to.equal(200);
         expect(res.body).to.have.property('data');
@@ -154,7 +175,7 @@ describe('POST user signin', () => {
     request(app)
       .post('/api/v1/auth/signin')
       .send({
-        email: 'invaliduser@gmail.com',
+        email: 'invalidUser1@gmail.com',
         password: 'Lyonnais',
       })
       .end((err, res) => {
@@ -168,7 +189,7 @@ describe('POST user signin', () => {
     request(app)
       .post('/api/v1/auth/signin')
       .send({
-        email: 'memphis@gmail.com',
+        email: 'rigatoni@gmail.com',
         password: 'Lyonnais123',
       })
       .end((err, res) => {
@@ -196,7 +217,7 @@ describe('POST user signin', () => {
     request(app)
       .post('/api/v1/auth/signin')
       .send({
-        email: 'memphis@gmail.com',
+        email: 'rigatoni@gmail.com',
         password: '',
       })
       .end((err, res) => {
@@ -213,7 +234,7 @@ describe('User forgot password test', () => {
     request(app)
       .post('/api/v1/auth/forgot_password')
       .send({
-        email: 'maximusekeh@gmail.com',
+        email: 'rigatoni@gmail.com',
       })
       .end((err, res) => {
         expect(res.status).to.equal(200);
@@ -236,10 +257,18 @@ describe('User forgot password test', () => {
 });
 
 describe('User reset password test', () => {
-  const user = Users[0];
-  const validUserResetToken = jwt.sign({ email: user.email }, user.password, { expiresIn: '1h' });
-  const invalidUserResetToken = jwt.sign({ email: 'non@gmail.com' }, user.password, { expiresIn: '1h' });
-  const invalidToken = jwt.sign({ email: user.email }, 'fake-secret', { expiresIn: '1h' });
+  // get user's email and password from db
+  let validUserResetToken;
+  let invalidUserResetToken;
+  let invalidToken;
+  before(async () => {
+    const userResult = await pool.query('SELECT email, password FROM users WHERE email = $1', [validUser1.email]);
+    const [user] = userResult.rows;
+    validUserResetToken = jwt.sign({ email: user.email }, user.password, { expiresIn: '1h' });
+    invalidUserResetToken = jwt.sign({ email: 'non@gmail.com' }, user.password, { expiresIn: '1h' });
+    invalidToken = jwt.sign({ email: user.email }, 'fake-secret', { expiresIn: '1h' });
+  });
+
 
   it('should return an error when passed non-existing user', (done) => {
     request(app)

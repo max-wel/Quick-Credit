@@ -1,7 +1,5 @@
-import Loans from '../models/loans';
-import Repayments from '../models/repayments';
-import Users from '../models/users';
 import mailer from '../helpers/mailer';
+import pool from '../db/config';
 
 /**
  * @function createLoan
@@ -10,41 +8,37 @@ import mailer from '../helpers/mailer';
  * @param {object} res Response Object
  * @returns {object} JSON Response
  */
-const createLoan = (req, res) => {
+const createLoan = async (req, res) => {
   const { email } = req.user;
   const amount = Number(req.body.amount);
   const tenor = Number(req.body.tenor);
   const interest = Number(((5 / 100) * amount).toFixed(2));
   const paymentInstallment = Number(((amount + interest) / tenor).toFixed(2));
-
-  const newLoan = {
-    id: Loans.length + 1,
-    user: email,
-    createdOn: new Date(),
-    status: 'pending',
-    repaid: false,
-    tenor,
-    amount,
-    paymentInstallment,
-    balance: Number((amount + interest).toFixed(2)),
-    interest,
-  };
-
-  const existingLoans = Loans.filter(loan => loan.user === email);
-
-  const repaidLoan = existingLoans.filter(loan => loan.repaid === false);
-  if (repaidLoan.length !== 0) {
-    return res.status(400).json({
-      status: 400,
-      error: 'You have an unsettled loan',
+  const balance = Number((amount + interest).toFixed(2));
+  try {
+    const loanResult = await pool.query('SELECT * FROM loans WHERE "userEmail" = $1 AND repaid = false', [email]);
+    if (loanResult.rows[0]) {
+      return res.status(400).json({
+        status: 400,
+        error: 'You have an unsettled loan',
+      });
+    }
+    const query = {
+      text: 'INSERT INTO loans ("userEmail", tenor, amount, "paymentInstallment", balance, interest) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id, "userEmail", status, repaid, tenor, amount::float, "paymentInstallment"::float, balance::float, interest::float, "createdOn"',
+      values: [email, tenor, amount, paymentInstallment, balance, interest],
+    };
+    const result = await pool.query(query);
+    return res.status(201).json({
+      status: 201,
+      data: result.rows[0],
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      status: 500,
+      error: 'Internal server error',
     });
   }
-
-  Loans.push(newLoan);
-  return res.status(201).json({
-    status: 201,
-    data: newLoan,
-  });
 };
 
 /**
@@ -54,28 +48,32 @@ const createLoan = (req, res) => {
  * @param {object} res Response Object
  * @returns {object} JSON Response
  */
-const getAllLoans = (req, res) => {
+const getAllLoans = async (req, res) => {
   const { status, repaid } = req.query;
-
-  if (status === 'approved' && repaid === 'false') {
-    const currentLoans = Loans.filter(loan => loan.status === status && !loan.repaid);
+  try {
+    if (status === 'approved' && (repaid === 'true' || repaid === 'false')) {
+      const query = {
+        text: 'SELECT id, "userEmail", status, repaid, tenor, amount::float, "paymentInstallment"::float, balance::float, interest::float, "createdOn" FROM loans WHERE status = $1 AND repaid = $2',
+        values: [status, repaid],
+      };
+      const result = await pool.query(query);
+      return res.json({
+        status: 200,
+        data: result.rows,
+      });
+    }
+    const result = await pool.query('SELECT id, "userEmail", status, repaid, tenor, amount::float, "paymentInstallment"::float, balance::float, interest::float, "createdOn" FROM loans');
     return res.json({
       status: 200,
-      data: currentLoans,
+      data: result.rows,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      status: 500,
+      error: 'Internal server error',
     });
   }
-  if (status === 'approved' && repaid === 'true') {
-    const repaidLoans = Loans.filter(loan => loan.status === status && loan.repaid);
-    return res.json({
-      status: 200,
-      data: repaidLoans,
-    });
-  }
-
-  return res.json({
-    status: 200,
-    data: Loans,
-  });
 };
 
 /**
@@ -85,19 +83,30 @@ const getAllLoans = (req, res) => {
  * @param {object} res Response Object
  * @returns {object} JSON Response
  */
-const getSpecificLoan = (req, res) => {
+const getSpecificLoan = async (req, res) => {
   const loanId = parseInt(req.params.id, 10);
-  const loan = Loans.find(item => item.id === loanId);
-  if (!loan) {
-    return res.status(404).json({
-      status: 404,
-      error: 'No loan found',
+  const query = {
+    text: 'SELECT id, "userEmail", status, repaid, tenor, amount::float, "paymentInstallment"::float, balance::float, interest::float, "createdOn" FROM loans WHERE id = $1',
+    values: [loanId],
+  };
+  try {
+    const result = await pool.query(query);
+    if (!result.rows[0]) {
+      return res.status(404).json({
+        status: 404,
+        error: 'No loan found',
+      });
+    }
+    return res.json({
+      status: 200,
+      data: result.rows[0],
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: 500,
+      error: 'Internal server error',
     });
   }
-  return res.json({
-    status: 200,
-    data: loan,
-  });
 };
 
 /**
@@ -107,26 +116,37 @@ const getSpecificLoan = (req, res) => {
  * @param {object} res Response Object
  * @returns {object} JSON Response
  */
-const updateLoanStatus = (req, res) => {
+const updateLoanStatus = async (req, res) => {
   const loanId = parseInt(req.params.id, 10);
   const { status } = req.body;
 
-  const loan = Loans.find(item => item.id === loanId);
-  if (!loan) {
-    return res.status(400).json({
-      status: 400,
-      error: 'Invalid id parameter',
+  try {
+    const loan = await pool.query('SELECT * FROM loans WHERE id = $1 ', [loanId]);
+    if (!loan.rows[0]) {
+      return res.status(404).json({
+        status: 404,
+        error: 'Loan does not exist',
+      });
+    }
+    // update loan status
+    const query = {
+      text: 'UPDATE loans SET status = $1 WHERE id = $2 RETURNING id, "userEmail", status, repaid, tenor, amount::float, "paymentInstallment"::float, balance::float, interest::float, "createdOn"',
+      values: [status, loanId],
+    };
+    const updatedLoan = await pool.query(query);
+    // get user object and send notification mail
+    const user = await pool.query('SELECT * FROM users WHERE email = $1', [updatedLoan.rows[0].userEmail]);
+    mailer.sendLoanNotificationMail(user.rows[0], status);
+    return res.json({
+      status: 200,
+      data: updatedLoan.rows[0],
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: 500,
+      error: 'Internal server error',
     });
   }
-  // update loan status
-  loan.status = status;
-  // get user and send notification mail
-  const user = Users.find(item => item.email === loan.user);
-  mailer.sendLoanNotificationMail(user, status);
-  return res.json({
-    status: 200,
-    data: loan,
-  });
 };
 
 /**
@@ -136,53 +156,64 @@ const updateLoanStatus = (req, res) => {
  * @param {object} res Response Object
  * @returns {object} JSON Response
  */
-const repayLoan = (req, res) => {
+const repayLoan = async (req, res) => {
   const loanId = parseInt(req.params.id, 10);
   const paidAmount = Number(req.body.paidAmount);
 
-  const loan = Loans.find(item => item.id === loanId);
-  if (!loan) {
-    return res.status(400).json({
-      status: 400,
-      error: 'Invalid id parameter',
+  try {
+    const loan = await pool.query('SELECT id, "userEmail", status, repaid, tenor, amount::float, "paymentInstallment"::float, balance::float, interest::float, "createdOn" FROM loans WHERE id = $1', [loanId]);
+    if (loan.rowCount < 1) {
+      return res.status(404).json({
+        status: 404,
+        error: 'Loan does not exist',
+      });
+    }
+    // check if loan has been approved
+    if (loan.rows[0].status !== 'approved') {
+      return res.status(400).json({
+        status: 400,
+        error: 'Loan is not approved',
+      });
+    }
+    // check if loan has been repaid
+    if (loan.rows[0].repaid) {
+      return res.status(400).json({
+        status: 400,
+        error: 'Loan already repaid',
+      });
+    }
+    // check if paidAmount exceeds balance
+    if (paidAmount > loan.rows[0].balance) {
+      return res.status(400).json({
+        status: 400,
+        error: 'Paid amount exceeds current balance',
+      });
+    }
+    // compute new balancce
+    const newBalance = Number((loan.rows[0].balance - paidAmount).toFixed(2));
+    // update balance
+    const updatedLoan = await pool.query('UPDATE loans SET balance = $1 WHERE id = $2 RETURNING amount::float, "paymentInstallment"::float', [newBalance, loanId]);
+    // update repaid
+    if (newBalance === 0) {
+      await pool.query('UPDATE loans SET repaid = $1 WHERE id = $2', [true, loanId]);
+    }
+    // create repayment record
+    const query = {
+      text: 'INSERT INTO repayments ("loanId", "paidAmount", balance) VALUES ($1, $2, $3) RETURNING id, "loanId", "createdOn", "paidAmount"::float, balance::float',
+      values: [loanId, paidAmount, newBalance],
+    };
+    const result = await pool.query(query);
+    const repayment = { ...result.rows[0], ...updatedLoan.rows[0] };
+    return res.status(201).json({
+      status: 201,
+      data: repayment,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: 500,
+      error: 'Internal server error',
     });
   }
-  // check if loan has been approved
-  if (loan.status !== 'approved') {
-    return res.status(400).json({
-      status: 400,
-      error: 'Loan is not approved',
-    });
-  }
-  // check if loan has been repaid
-  if (loan.repaid) {
-    return res.status(400).json({
-      status: 400,
-      error: 'Loan already repaid',
-    });
-  }
-  // compute new balance
-  const newBalance = Number((loan.balance - paidAmount).toFixed(2));
-  loan.balance = newBalance;
-  if (newBalance === 0) {
-    loan.repaid = true;
-  }
-  // create repayment record
-  const repayment = {
-    id: Repayments.length + 1,
-    loanId,
-    createdOn: new Date(),
-    paidAmount,
-    amount: loan.amount,
-    monthlyInstallment: loan.paymentInstallment,
-    balance: loan.balance,
-  };
-  Repayments.push(repayment);
-
-  return res.status(201).json({
-    status: 201,
-    data: repayment,
-  });
 };
 
 /**
@@ -192,29 +223,46 @@ const repayLoan = (req, res) => {
  * @param {object} res Response Object
  * @returns {object} JSON Response
  */
-const getRepayments = (req, res) => {
+const getRepayments = async (req, res) => {
   const loanId = parseInt(req.params.id, 10);
   const { email } = req.user;
-  // check if loan belongs to user (get user email from loan db)
-  const loan = Loans.find(item => item.id === loanId);
-  if (!loan) {
-    return res.status(400).json({
-      status: 400,
-      error: 'Invalid loan id',
+  try {
+    // check if loan exists and belongs to user
+    const loanResult = await pool.query('SELECT * FROM loans WHERE id = $1', [loanId]);
+    const loan = loanResult.rows[0];
+    if (!loan) {
+      return res.status(404).json({
+        status: 404,
+        error: 'Loan does not exist',
+      });
+    }
+    if (loan.userEmail !== email) {
+      return res.status(403).json({
+        status: 403,
+        error: 'Access forbidden',
+      });
+    }
+    // get repayments
+    const query = {
+      text: `SELECT repayments.id, "loanId", "paidAmount"::float, repayments.balance::float, repayments."createdOn", amount::float, "paymentInstallment"::float 
+      FROM repayments
+      JOIN loans ON loans.id = "loanId"
+      WHERE "loanId" = $1`,
+      values: [loanId],
+    };
+    const repayments = await pool.query(query);
+    return res.json({
+      status: 200,
+      data: repayments.rows,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: 500,
+      error: 'Internal server error',
     });
   }
-  if (loan.user !== email) {
-    return res.status(403).json({
-      status: 403,
-      error: 'Access forbidden',
-    });
-  }
-  const repayments = Repayments.filter(repayment => repayment.loanId === loanId);
-  return res.json({
-    status: 200,
-    data: repayments,
-  });
 };
+
 
 export default {
   createLoan, getAllLoans, getSpecificLoan, updateLoanStatus, repayLoan, getRepayments,

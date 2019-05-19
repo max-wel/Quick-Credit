@@ -1,10 +1,15 @@
 import { expect } from 'chai';
 import request from 'supertest';
 import app from '../app';
+import pool from '../db/config';
 
-const user = {
-  email: 'memphis@gmail.com',
-  password: 'Lyonnais',
+const user1 = {
+  email: 'rigatoni@gmail.com',
+  password: 'new-pass',
+};
+const user2 = {
+  email: 'pasta@gmail.com',
+  password: 'blurryface',
 };
 const admin = {
   email: 'sneaky@gmail.com',
@@ -12,28 +17,45 @@ const admin = {
 };
 
 describe('Loan Tests', () => {
-  // login and get valid token. Make sure users.spec is called first to create user
-  let userToken;
+  // login and get valid token. Make sure user1s.spec is called first to create user1
+  let userToken1;
+  let userToken2;
   let adminToken;
   before((done) => {
     request(app)
       .post('/api/v1/auth/signin')
-      .send(user)
-      .end((err, res) => {
-        userToken = res.body.data.token;
-        expect(res.status).to.equal(200);
-        expect(res.body).to.have.property('data');
+      .send(user1)
+      .end((err1, res1) => {
+        userToken1 = res1.body.data.token;
+        expect(res1.status).to.equal(200);
+        expect(res1.body).to.have.property('data');
 
         request(app)
           .post('/api/v1/auth/signin')
-          .send(admin)
-          .end((adminErr, adminRes) => {
-            adminToken = adminRes.body.data.token;
-            expect(adminRes.status).to.equal(200);
-            expect(adminRes.body).to.have.property('data');
-            done();
+          .send(user2)
+          .end((err2, res2) => {
+            userToken2 = res2.body.data.token;
+            expect(res2.status).to.equal(200);
+            expect(res2.body).to.have.property('data');
+
+            request(app)
+              .post('/api/v1/auth/signin')
+              .send(admin)
+              .end((adminErr, adminRes) => {
+                adminToken = adminRes.body.data.token;
+                expect(adminRes.status).to.equal(200);
+                expect(adminRes.body).to.have.property('data');
+                done();
+              });
           });
       });
+  });
+
+  after((done) => {
+    pool.query('TRUNCATE users RESTART IDENTITY CASCADE', (err, res) => {
+      console.log(err, res);
+      done();
+    });
   });
 
   describe('Invalid token test', () => {
@@ -43,6 +65,7 @@ describe('Loan Tests', () => {
         .end((err, res) => {
           expect(res.status).to.equal(401);
           expect(res.body).to.have.property('error');
+          expect(res.body.error).to.equal('No token found');
           done();
         });
     });
@@ -53,6 +76,7 @@ describe('Loan Tests', () => {
         .end((err, res) => {
           expect(res.status).to.equal(401);
           expect(res.body).to.have.property('error');
+          expect(res.body.error).to.equal('Invalid token');
           done();
         });
     });
@@ -62,24 +86,36 @@ describe('Loan Tests', () => {
     it('should return a new loan application', (done) => {
       request(app)
         .post('/api/v1/loans')
-        .set('x-access-token', userToken)
+        .set('x-access-token', userToken1)
         .send({
-          tenor: '5',
-          amount: '1500.00',
+          tenor: 5,
+          amount: 1500.00,
         })
         .end((err, res) => {
           expect(res.status).to.equal(201);
           expect(res.body).to.have.property('data');
-          done();
+
+          request(app)
+            .post('/api/v1/loans')
+            .set('x-access-token', userToken2)
+            .send({
+              tenor: 5,
+              amount: 1500.00,
+            })
+            .end((err1, res1) => {
+              expect(res1.status).to.equal(201);
+              expect(res1.body).to.have.property('data');
+              done();
+            });
         });
     });
-    it('should return an error if user tries to request for more than one loan', (done) => {
+    it('should return an error if user1 tries to request for more than one loan', (done) => {
       request(app)
         .post('/api/v1/loans')
-        .set('x-access-token', userToken)
+        .set('x-access-token', userToken1)
         .send({
-          tenor: '5',
-          amount: '1500.00',
+          tenor: 5,
+          amount: 1500.00,
         })
         .end((err, res) => {
           expect(res.status).to.equal(400);
@@ -91,10 +127,10 @@ describe('Loan Tests', () => {
     it('should return an error when passed empty tenor', (done) => {
       request(app)
         .post('/api/v1/loans')
-        .set('x-access-token', userToken)
+        .set('x-access-token', userToken1)
         .send({
           tenor: '',
-          amount: '1500.00',
+          amount: 1500.00,
         })
         .end((err, res) => {
           expect(res.status).to.equal(400);
@@ -106,10 +142,10 @@ describe('Loan Tests', () => {
     it('should return an error when passed invalid tenor', (done) => {
       request(app)
         .post('/api/v1/loans')
-        .set('x-access-token', userToken)
+        .set('x-access-token', userToken1)
         .send({
-          tenor: '13',
-          amount: '1500.00',
+          tenor: 13,
+          amount: 1500.00,
         })
         .end((err, res) => {
           expect(res.status).to.equal(400);
@@ -121,9 +157,9 @@ describe('Loan Tests', () => {
     it('should return an error when passed empty amount', (done) => {
       request(app)
         .post('/api/v1/loans')
-        .set('x-access-token', userToken)
+        .set('x-access-token', userToken1)
         .send({
-          tenor: '3',
+          tenor: 3,
           amount: '',
         })
         .end((err, res) => {
@@ -136,9 +172,9 @@ describe('Loan Tests', () => {
     it('should return an error when passed invalid amount', (done) => {
       request(app)
         .post('/api/v1/loans')
-        .set('x-access-token', userToken)
+        .set('x-access-token', userToken1)
         .send({
-          tenor: '3',
+          tenor: 3,
           amount: '150A.00',
         })
         .end((err, res) => {
@@ -164,10 +200,11 @@ describe('Loan Tests', () => {
     it('should return an error when non-admin tries to get all loans', (done) => {
       request(app)
         .get('/api/v1/loans')
-        .set('x-access-token', userToken)
+        .set('x-access-token', userToken1)
         .end((err, res) => {
           expect(res.status).to.equal(403);
           expect(res.body).to.have.property('error');
+          expect(res.body.error).to.equal('Access forbidden, admin only');
           done();
         });
     });
@@ -216,24 +253,13 @@ describe('Loan Tests', () => {
         .end((err, res) => {
           expect(res.status).to.equal(404);
           expect(res.body).to.have.property('error');
+          expect(res.body.error).to.equal('No loan found');
           done();
         });
     });
   });
 
   describe('Admin approve/reject loan application', () => {
-    it('should approve a loan application', (done) => {
-      request(app)
-        .patch('/api/v1/loans/6')
-        .set('x-access-token', adminToken)
-        .send({ status: 'approved' })
-        .end((err, res) => {
-          expect(res.status).to.equal(200);
-          expect(res.body).to.have.property('data');
-          expect(res.body.data.status).to.equal('approved');
-          done();
-        });
-    });
     it('should reject a loan application', (done) => {
       request(app)
         .patch('/api/v1/loans/1')
@@ -246,14 +272,27 @@ describe('Loan Tests', () => {
           done();
         });
     });
+    it('should approve a loan application', (done) => {
+      request(app)
+        .patch('/api/v1/loans/1')
+        .set('x-access-token', adminToken)
+        .send({ status: 'approved' })
+        .end((err, res) => {
+          expect(res.status).to.equal(200);
+          expect(res.body).to.have.property('data');
+          expect(res.body.data.status).to.equal('approved');
+          done();
+        });
+    });
     it('should return an error when passed invalid loan-id parameter', (done) => {
       request(app)
         .patch('/api/v1/loans/90')
         .set('x-access-token', adminToken)
         .send({ status: 'approved' })
         .end((err, res) => {
-          expect(res.status).to.equal(400);
+          expect(res.status).to.equal(404);
           expect(res.body).to.have.property('error');
+          expect(res.body.error).to.equal('Loan does not exist');
           done();
         });
     });
@@ -265,6 +304,7 @@ describe('Loan Tests', () => {
         .end((err, res) => {
           expect(res.status).to.equal(400);
           expect(res.body).to.have.property('error');
+          expect(res.body.error).to.equal('Invalid status');
           done();
         });
     });
@@ -273,9 +313,9 @@ describe('Loan Tests', () => {
   describe('Admin POST loan repayment', () => {
     it('should create a loan repayment', (done) => {
       request(app)
-        .post('/api/v1/loans/6/repayment')
+        .post('/api/v1/loans/1/repayment')
         .set('x-access-token', adminToken)
-        .send({ paidAmount: '400.00' })
+        .send({ paidAmount: 1575.00 })
         .end((err, res) => {
           expect(res.status).to.equal(201);
           expect(res.body).to.have.property('data');
@@ -286,17 +326,17 @@ describe('Loan Tests', () => {
       request(app)
         .post('/api/v1/loans/90/repayment')
         .set('x-access-token', adminToken)
-        .send({ paidAmount: '400.00' })
+        .send({ paidAmount: 400.00 })
         .end((err, res) => {
-          expect(res.status).to.equal(400);
+          expect(res.status).to.equal(404);
           expect(res.body).to.have.property('error');
-          expect(res.body.error).to.equal('Invalid id parameter');
+          expect(res.body.error).to.equal('Loan does not exist');
           done();
         });
     });
     it('should return an error if loan is not approved', (done) => {
       request(app)
-        .post('/api/v1/loans/1/repayment')
+        .post('/api/v1/loans/2/repayment')
         .set('x-access-token', adminToken)
         .send({ paidAmount: '400.00' })
         .end((err, res) => {
@@ -308,7 +348,7 @@ describe('Loan Tests', () => {
     });
     it('should return an error if loan has been repaid', (done) => {
       request(app)
-        .post('/api/v1/loans/5/repayment')
+        .post('/api/v1/loans/1/repayment')
         .set('x-access-token', adminToken)
         .send({ paidAmount: '400.00' })
         .end((err, res) => {
@@ -332,11 +372,11 @@ describe('Loan Tests', () => {
     });
   });
 
-  describe('User GET loan repayment history', () => {
+  describe('user GET loan repayment history', () => {
     it('should return loan repayment history', (done) => {
       request(app)
-        .get('/api/v1/loans/6/repayments')
-        .set('x-access-token', userToken)
+        .get('/api/v1/loans/1/repayments')
+        .set('x-access-token', userToken1)
         .end((err, res) => {
           expect(res.status).to.equal(200);
           expect(res.body).to.have.property('data');
@@ -346,18 +386,18 @@ describe('Loan Tests', () => {
     it('should return an error when passed invalid loan id', (done) => {
       request(app)
         .get('/api/v1/loans/70/repayments')
-        .set('x-access-token', userToken)
+        .set('x-access-token', userToken1)
         .end((err, res) => {
-          expect(res.status).to.equal(400);
+          expect(res.status).to.equal(404);
           expect(res.body).to.have.property('error');
-          expect(res.body.error).to.equal('Invalid loan id');
+          expect(res.body.error).to.equal('Loan does not exist');
           done();
         });
     });
-    it('should return an error if loan does not belong to user', (done) => {
+    it('should return an error if loan does not belong to user1', (done) => {
       request(app)
-        .get('/api/v1/loans/2/repayments')
-        .set('x-access-token', userToken)
+        .get('/api/v1/loans/1/repayments')
+        .set('x-access-token', userToken2)
         .end((err, res) => {
           expect(res.status).to.equal(403);
           expect(res.body).to.have.property('error');
@@ -370,7 +410,7 @@ describe('Loan Tests', () => {
   describe('Admin verify client', () => {
     it('should return a verified client', (done) => {
       request(app)
-        .patch('/api/v1/users/memphis@gmail.com/verify')
+        .patch('/api/v1/users/rigatoni@gmail.com/verify')
         .set('x-access-token', adminToken)
         .send({ status: 'verified' })
         .end((err, res) => {
@@ -387,17 +427,19 @@ describe('Loan Tests', () => {
         .end((err, res) => {
           expect(res.status).to.equal(404);
           expect(res.body).to.have.property('error');
+          expect(res.body.error).to.equal('Client does not exist');
           done();
         });
     });
     it('should return an error when passed invalid status', (done) => {
       request(app)
-        .patch('/api/v1/users/memphis@gmail.com/verify')
+        .patch('/api/v1/users/rigatoni@gmail.com/verify')
         .set('x-access-token', adminToken)
         .send({ status: 'qweerty' })
         .end((err, res) => {
           expect(res.status).to.equal(400);
           expect(res.body).to.have.property('error');
+          expect(res.body.error).to.equal('Invalid status');
           done();
         });
     });

@@ -9,10 +9,10 @@
 const loanValidator = (req, res, next) => {
   // const emailRegex = /^[^@]+@[^@]+\.[^@]+$/;
   const tenorRegex = /^([2-9]|1[0-2]?)$/;
-  const amountRegex = /^\d+\.\d{2}$/;
+  const amountRegex = /^\d+(\.\d{0,2})?$/;
   const { tenor, amount } = req.body;
 
-  if (!tenor || tenor.trim() === '') {
+  if (!tenor) {
     return res.status(400).json({
       status: 400,
       error: 'Tenor is required',
@@ -24,7 +24,7 @@ const loanValidator = (req, res, next) => {
       error: 'Invalid tenor',
     });
   }
-  if (!amount || amount.trim() === '') {
+  if (!amount) {
     return res.status(400).json({
       status: 400,
       error: 'Amount is required',
@@ -138,7 +138,8 @@ const updateLoanValidator = (req, res, next) => {
  */
 const repayLoanValidator = (req, res, next) => {
   const { paidAmount } = req.body;
-  const regex = /^\d+\.\d{2}$/;
+  const regex = /^\d+(\.\d{0,2})?$/;
+  console.log(paidAmount.toString());
   if (!regex.test(paidAmount)) {
     return res.status(400).json({
       status: 400,
