@@ -15,6 +15,9 @@ nav {
   align-items: baseline;
   padding: 1.6em 4em;
   box-shadow: 0 4px 5px -5px rgb(173, 172, 172);
+  position: fixed;
+  background-color: white;
+  z-index: 100;
 }
 .nav-heading a{
   text-decoration: none;
@@ -35,6 +38,9 @@ nav {
   align-items: center;
   /* padding-top: 1.5em; */
   border-right: 1px solid rgb(107, 107, 107);
+  position: fixed;
+  top: 5em;
+  width: 25%;
 }
 .avatar {
   width: 10em;
@@ -58,9 +64,9 @@ hr {
 .loan-link {
   text-decoration: none;
   font-size: 1.5em;
-  margin-bottom: 0.7em;
-  padding-top: 0.3em;
-  padding-bottom: 0.5em;
+  margin-bottom: 0.9em;
+  padding-top: 0.4em;
+  padding-bottom: 0.6em;
   width: 100%;
   text-align: center;
   color: white;
@@ -68,31 +74,20 @@ hr {
 .loan-item {
   color: white;
 }
+.loan-item.active {
+  padding-bottom: 1.6px;
+  border-bottom: 4px solid rgb(255, 255, 255)
+}
 .loan-link:hover {
   background-color: rgb(140, 143, 140);
-}
-.loan-link.logout {
-  margin-top: 1em;
-}
-.request-btn {
-  padding: 0.8em 2em;
-  font-size: 1.4em;
-  border: none;
-  background-color: rgb(75, 236, 83);
-  color: white;
-  font-weight: bold;
-  text-decoration: none;
-}
-.request-btn:hover {
-  border: 1px solid rgb(75, 236, 83);
-  background-color: transparent;
-  cursor: pointer;
 }
 
 .main-panel {
   flex-basis: 75%;
   /* padding-top: 3em; */
-  height: 100vh;
+  position: relative;
+  left: 25%;
+  top: 5em;
 }
 .main-panel__heading {
   text-align: center;
@@ -117,9 +112,9 @@ hr {
   flex-basis: 27%;
   border-left: 3px solid rgb(63, 63, 172);
   border-right: 1px solid rgb(204, 202, 202);
-  font-size: 2em;
+  font-size: 1.7em;
   text-align: left;
-  padding: 0.5em;
+  padding: 0 1em;
   
 }
 .loan-date__month, .loan-date__year {
@@ -135,18 +130,20 @@ hr {
   display: flex;
   margin-left: 1em;
 }
+
 .loan-amount, .loan-installment, .loan-history-balance {
-  flex-basis: 50%
+  flex-basis: 45%
 }
 .text {
   margin-bottom: 0.3em;
   color: rgb(141, 141, 141)
 }
-.loan-amount, .loan-installment, .loan-balance {
+.loan-amount, .loan-installment, .loan-balance, .loan-history-balance, .loan-repaid {
   margin-bottom: 0.6em;
 }
 .loan-amount__number, .loan-balance__number, .loan-repaid__number {
-  font-size: 2em;
+  /* font-size: 2em; */
+  font-size: 1.4em;
 }
 .loan-balance__number {
   color: rgb(13, 197, 13);
@@ -159,18 +156,35 @@ hr {
   color: white;
   background-color: rgb(98, 111, 231);
   padding: 10px;
-  position: relative;
-  top: 1.3em;
   border-radius: 10px;
 }
-
+.action {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  margin-bottom: 0.6em;
+}
+.btn-details {
+  text-decoration: none;
+  margin-left: 5em;
+  text-align: center;
+  font-size: 0.9em;
+  padding: 0.5em 1em;
+  background-color: rgb(73, 73, 73);
+  color: white;
+}
+.btn-details:hover {
+  border: 1px solid rgb(73, 73, 73);
+  background-color: white;
+  color: #333;
+}
 /* loan apply */
 .form-wrapper {
   width: 100%;
   max-width: 30em;
   margin: auto;
   padding: 2em;
-  margin-top: 2em;
+  margin-top: 1em;
 }
 label {
   display: block;
@@ -201,7 +215,7 @@ input {
     width: 80%;
     z-index: 100;
     left: -80%;
-    transition: all 1.2s;
+    transition: all 1s;
   }
   .nav-toggle {
     display: block;
@@ -218,8 +232,20 @@ input {
   }
   .main-panel {
     flex-basis: 100%;
+    position: relative;
+    top: 76px;
+    left: 0;
+    z-index: 1;
   }
-  
+  .main-panel__heading {
+    font-size: 1.5em;
+  }
+  .loan-details {
+    padding: 0.5em 0.3em;
+  }
+  .loan-details-row {
+    flex-direction: column;
+  }
   .loan-wrapper {
     display: flex;
     flex-direction: column;
@@ -230,15 +256,36 @@ input {
     font-size: 1.3em;
     border: none;
     border-bottom: 1px solid #eee;
+    padding-top: 0.3em;
+    padding-bottom: 0.3em;
   }
-  .loan-date__month {
-    margin-left: 1em;
-  }
+ 
   .loan-date__year {
     margin-left: 1em;
   }
   .loan-amount__number, .loan-balance__number, .loan-repaid__number {
-    font-size: 1.5em;
+    font-size: 1.2em;
+  }
+  .loan-installment__number {
+    font-size: 1em;
+  }
+  .loan-status {
+    padding: 8px;
+    font-size: 0.7em;
+    position: absolute;
+    top: 1em;
+    right: 1.4em;
+  }
+  .btn-details {
+    margin-top: 1em;
+    margin-left: 0;
+    font-size: 0.8em;
+  }
+  .loan-details-row {
+    position: relative;
+  }
+  .action {
+    display: block;
   }
 }
 @media only screen and (min-device-width: 600px) and (max-device-width: 1024px) {

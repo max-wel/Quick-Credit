@@ -1,6 +1,5 @@
 import jwt from 'jsonwebtoken';
 import generateToken from '../helpers/generateToken';
-import Users from '../models/users';
 import passwordEncrypt from '../helpers/bcrypt';
 import mailer from '../helpers/mailer';
 import pool from '../db/config';
@@ -141,28 +140,34 @@ const verifyClient = async (req, res) => {
  * @param {object} res Response Object
  * @returns {object} JSON Response
  */
-const forgotPassword = (req, res) => {
+const forgotPassword = async (req, res) => {
   const { email } = req.body;
-  // check if user with the email exists
-  const user = Users.find(item => item.email === email);
-  if (!user) {
-    return res.status(404).json({
-      status: 404,
-      error: 'Email does not exist',
+  try {
+    const result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+    const user = result.rows[0];
+    if (!user) {
+      return res.status(404).json({
+        status: 404,
+        error: 'Email does not exist',
+      });
+    }
+    const resetSecret = user.password;
+    const resetToken = generateToken.signToken({ email: user.email }, resetSecret, '1h');
+    console.log(resetToken);
+    mailer.sendResetMail(user, resetToken);
+    return res.json({
+      status: 200,
+      data: {
+        message: 'Password reset mail sent',
+      },
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      status: 500,
+      error: 'Internal server error',
     });
   }
-  // create reset token (sign with user password hash)
-  const resetSecret = user.password;
-  const resetToken = generateToken.signToken({ email: user.email }, resetSecret, '1h');
-  console.log(resetToken);
-  // send reset mail with password reset link
-  mailer.sendResetMail(user, resetToken);
-  return res.json({
-    status: 200,
-    data: {
-      message: 'Password reset mail sent',
-    },
-  });
 };
 
 /**
@@ -172,38 +177,48 @@ const forgotPassword = (req, res) => {
  * @param {object} res Response Object
  * @returns {object} JSON Response
  */
-const resetPassword = (req, res) => {
+const resetPassword = async (req, res) => {
   const resetToken = req.params.token;
   const { password } = req.body;
 
   // get user email from token
   const { email } = jwt.decode(resetToken) || {};
-  const user = Users.find(item => item.email === email);
-  if (!user) {
-    return res.status(404).json({
-      status: 404,
-      error: 'User not found',
-    });
-  }
-  // get user password and use as secret for one time token use
-  const resetSecret = user.password;
-
-  jwt.verify(resetToken, resetSecret, (err, decoded) => {
-    if (err) {
-      return res.status(400).json({
-        status: 400,
-        error: 'Expired reset link',
+  try {
+    const result = await pool.query('SELECT password FROM users WHERE email = $1', [email]);
+    const user = result.rows[0];
+    if (!user) {
+      return res.status(404).json({
+        status: 404,
+        error: 'User not found',
       });
     }
-    // update password
-    user.password = passwordEncrypt.hashPassword(password);
+    const resetSecret = user.password;
+    // no promise based implementation
+    jwt.verify(resetToken, resetSecret);
+    const query = {
+      text: 'UPDATE users SET password = $1 WHERE email = $2',
+      values: [passwordEncrypt.hashPassword(password), email],
+    };
+    await pool.query(query);
     return res.json({
       status: 200,
       data: {
         message: 'Password reset successful',
       },
     });
-  });
+  } catch (error) {
+    if (error.name === 'TokenExpiredError' || error.name === 'JsonWebTokenError') {
+      return res.status(400).json({
+        status: 400,
+        error: 'Expired reset link',
+      });
+    }
+    console.log(error);
+    return res.status(500).json({
+      status: 500,
+      error: 'Internal server error',
+    });
+  }
 };
 
 export default {
