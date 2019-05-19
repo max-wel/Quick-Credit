@@ -369,7 +369,7 @@ describe('Loan Tests', () => {
   describe('user GET loan repayment history', () => {
     it('should return loan repayment history', (done) => {
       request(app)
-        .get('/api/v1/loans/2/repayments')
+        .get('/api/v1/loans/1/repayments')
         .set('x-access-token', userToken1)
         .end((err, res) => {
           expect(res.status).to.equal(200);
@@ -382,16 +382,16 @@ describe('Loan Tests', () => {
         .get('/api/v1/loans/70/repayments')
         .set('x-access-token', userToken1)
         .end((err, res) => {
-          expect(res.status).to.equal(400);
+          expect(res.status).to.equal(404);
           expect(res.body).to.have.property('error');
-          expect(res.body.error).to.equal('Invalid loan id');
+          expect(res.body.error).to.equal('Loan does not exist');
           done();
         });
     });
     it('should return an error if loan does not belong to user1', (done) => {
       request(app)
         .get('/api/v1/loans/1/repayments')
-        .set('x-access-token', userToken1)
+        .set('x-access-token', userToken2)
         .end((err, res) => {
           expect(res.status).to.equal(403);
           expect(res.body).to.have.property('error');

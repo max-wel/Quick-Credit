@@ -65,7 +65,6 @@ const getAllLoans = async (req, res) => {
       });
     }
     const result = await pool.query('SELECT id, "userEmail", status, repaid, tenor, amount::float, "paymentInstallment"::float, balance::float, interest::float, "createdOn" FROM loans');
-    console.log(result);
     return res.json({
       status: 200,
       data: result.rows,
@@ -121,7 +120,6 @@ const getSpecificLoan = async (req, res) => {
  */
 const updateLoanStatus = async (req, res) => {
   const loanId = parseInt(req.params.id, 10);
-  console.log(loanId);
   const { status } = req.body;
 
   try {
@@ -227,29 +225,46 @@ const repayLoan = async (req, res) => {
  * @param {object} res Response Object
  * @returns {object} JSON Response
  */
-const getRepayments = (req, res) => {
+const getRepayments = async (req, res) => {
   const loanId = parseInt(req.params.id, 10);
   const { email } = req.user;
-  // check if loan belongs to user (get user email from loan db)
-  const loan = Loans.find(item => item.id === loanId);
-  if (!loan) {
-    return res.status(400).json({
-      status: 400,
-      error: 'Invalid loan id',
+  try {
+    // check if loan exists and belongs to user
+    const loanResult = await pool.query('SELECT * FROM loans WHERE id = $1', [loanId]);
+    const loan = loanResult.rows[0];
+    if (!loan) {
+      return res.status(404).json({
+        status: 404,
+        error: 'Loan does not exist',
+      });
+    }
+    if (loan.userEmail !== email) {
+      return res.status(403).json({
+        status: 403,
+        error: 'Access forbidden',
+      });
+    }
+    // get repayments
+    const query = {
+      text: `SELECT repayments.id, "loanId", "paidAmount"::float, repayments.balance::float, repayments."createdOn", amount::float, "paymentInstallment"::float 
+      FROM repayments
+      JOIN loans ON loans.id = "loanId"
+      WHERE "loanId" = $1`,
+      values: [loanId],
+    };
+    const repayments = await pool.query(query);
+    return res.json({
+      status: 200,
+      data: repayments.rows,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: 500,
+      error: 'Internal server error',
     });
   }
-  if (loan.user !== email) {
-    return res.status(403).json({
-      status: 403,
-      error: 'Access forbidden',
-    });
-  }
-  const repayments = Repayments.filter(repayment => repayment.loanId === loanId);
-  return res.json({
-    status: 200,
-    data: repayments,
-  });
 };
+
 
 export default {
   createLoan, getAllLoans, getSpecificLoan, updateLoanStatus, repayLoan, getRepayments,
