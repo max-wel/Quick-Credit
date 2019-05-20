@@ -9,6 +9,7 @@
   "scripts": {
     "prebuild": "rm -rf dist",
     "build": "babel server -d dist",
+    "postbuild": "node dist/db/migration",
     "start": "node dist/app",
     "test": "cross-env NODE_ENV=test npm run migration && cross-env NODE_ENV=test nyc --reporter=html mocha --require @babel/register ./server/test/index.spec --exit",
     "start:dev": "npm run migration && nodemon --exec babel-node ./server/app.js",
