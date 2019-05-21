@@ -239,7 +239,7 @@ const getRepayments = async (req, res) => {
     if (loan.userEmail !== email) {
       return res.status(403).json({
         status: 403,
-        error: 'Access forbidden',
+        error: 'Loan does not belong to you',
       });
     }
     // get repayments

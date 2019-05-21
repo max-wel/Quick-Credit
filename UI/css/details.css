@@ -36,6 +36,7 @@ nav {
 }
 .container {
   padding: 1em;
+  height: 100vh;
 }
 .details-wrapper {
   width: 100%;

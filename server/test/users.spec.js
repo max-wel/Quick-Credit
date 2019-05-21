@@ -69,7 +69,7 @@ describe('POST user signup', () => {
       .end((err, res) => {
         expect(res.status).to.equal(400);
         expect(res.body).to.have.property('error');
-        expect(res.body.error).to.equal('A user with this email exists');
+        expect(res.body.error).to.equal('A user with this email exist');
         done();
       });
   });

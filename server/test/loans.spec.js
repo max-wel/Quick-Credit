@@ -204,7 +204,7 @@ describe('Loan Tests', () => {
         .end((err, res) => {
           expect(res.status).to.equal(403);
           expect(res.body).to.have.property('error');
-          expect(res.body.error).to.equal('Access forbidden, admin only');
+          expect(res.body.error).to.equal('You do not have access to this resource');
           done();
         });
     });
@@ -401,7 +401,7 @@ describe('Loan Tests', () => {
         .end((err, res) => {
           expect(res.status).to.equal(403);
           expect(res.body).to.have.property('error');
-          expect(res.body.error).to.equal('Access forbidden');
+          expect(res.body.error).to.equal('Loan does not belong to you');
           done();
         });
     });
