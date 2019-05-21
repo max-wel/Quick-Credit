@@ -22,6 +22,7 @@ router.post('/loans/:id/repayment', verify.isLoggedIn, verify.adminOnly, validat
 router.get('/loans/:id/repayments', verify.isLoggedIn, loansController.getRepayments);
 // additional routes
 router.get('/user/loans', verify.isLoggedIn, loansController.getUserLoan);
+router.get('/users', verify.isLoggedIn, verify.adminOnly, authController.getAllUsers);
 
 // auth routes
 router.post('/auth/signup', validation.signupValidator, authController.userSignup);

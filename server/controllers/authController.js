@@ -87,6 +87,7 @@ const userSignin = async (req, res) => {
         firstName: result.rows[0].firstName,
         lastName: result.rows[0].lastName,
         email: result.rows[0].email,
+        isAdmin: result.rows[0].isAdmin,
       },
     });
   } catch (error) {
@@ -223,6 +224,23 @@ const resetPassword = async (req, res) => {
   }
 };
 
+const getAllUsers = async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM users WHERE "isAdmin" = false');
+    const users = result.rows;
+    return res.json({
+      status: 200,
+      data: users,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      status: 500,
+      error: 'Internal server error',
+    });
+  }
+};
+
 export default {
-  userSignup, userSignin, verifyClient, forgotPassword, resetPassword,
+  userSignup, userSignin, verifyClient, forgotPassword, resetPassword, getAllUsers,
 };
