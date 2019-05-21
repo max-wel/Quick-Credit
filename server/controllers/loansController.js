@@ -53,7 +53,10 @@ const getAllLoans = async (req, res) => {
   try {
     if (status === 'approved' && (repaid === 'true' || repaid === 'false')) {
       const query = {
-        text: 'SELECT id, "userEmail", status, repaid, tenor, amount::float, "paymentInstallment"::float, balance::float, interest::float, "createdOn" FROM loans WHERE status = $1 AND repaid = $2',
+        text: `SELECT loans.id, "firstName", "userEmail", loans.status, repaid, tenor, amount::float, "paymentInstallment"::float, balance::float, interest::float, loans."createdOn"
+        FROM loans 
+        JOIN users ON loans."userEmail" = users.email
+        WHERE loans.status = $1 AND repaid = $2`,
         values: [status, repaid],
       };
       const result = await pool.query(query);
@@ -62,7 +65,12 @@ const getAllLoans = async (req, res) => {
         data: result.rows,
       });
     }
-    const result = await pool.query('SELECT id, "userEmail", status, repaid, tenor, amount::float, "paymentInstallment"::float, balance::float, interest::float, "createdOn" FROM loans');
+    const query = {
+      text: `SELECT loans.id, "firstName", "userEmail", loans.status, repaid, tenor, amount::float, "paymentInstallment"::float, balance::float, interest::float, loans."createdOn"
+      FROM loans 
+      JOIN users ON loans."userEmail" = users.email`,
+    };
+    const result = await pool.query(query);
     return res.json({
       status: 200,
       data: result.rows,
@@ -86,7 +94,10 @@ const getAllLoans = async (req, res) => {
 const getSpecificLoan = async (req, res) => {
   const loanId = parseInt(req.params.id, 10);
   const query = {
-    text: 'SELECT id, "userEmail", status, repaid, tenor, amount::float, "paymentInstallment"::float, balance::float, interest::float, "createdOn" FROM loans WHERE id = $1',
+    text: `SELECT loans.id, "firstName", "userEmail", loans.status, repaid, tenor, amount::float, "paymentInstallment"::float, balance::float, interest::float, loans."createdOn"
+    FROM loans 
+    JOIN users ON loans."userEmail" = users.email
+    WHERE loans.id = $1`,
     values: [loanId],
   };
   try {
