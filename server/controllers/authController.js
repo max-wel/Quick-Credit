@@ -18,8 +18,8 @@ const userSignup = async (req, res) => {
   try {
     const user = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
     if (user.rows[0]) {
-      return res.status(400).json({
-        status: 400,
+      return res.status(409).json({
+        status: 409,
         error: 'A user with this email exist',
       });
     }
