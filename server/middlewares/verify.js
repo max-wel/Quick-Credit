@@ -45,7 +45,7 @@ const adminOnly = (req, res, next) => {
   if (!isAdmin) {
     return res.status(403).json({
       status: 403,
-      error: 'Access forbidden, admin only',
+      error: 'You do not have access to this resource',
     });
   }
   return next();

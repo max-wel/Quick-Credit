@@ -38,10 +38,20 @@ const sendLoanNotificationMail = (user, status) => {
   const mailOptions = {
     from: 'notification@quick-credit',
     to: user.email,
-    subject: 'Password Recovery',
+    subject: 'Loan Notification',
     html: template.notification(user, status),
   };
   transporter.sendMail(mailOptions, (err, info) => console.log(err, info));
 };
 
-export default { sendResetMail, sendLoanNotificationMail };
+const sendWelcomeMail = (user) => {
+  const mailOptions = {
+    from: 'notification@quick-credit',
+    to: user.email,
+    subject: 'Welcome to Quick-Credit',
+    html: template.welcome(user),
+  };
+  transporter.sendMail(mailOptions, (err, info) => console.log(err, info));
+};
+
+export default { sendResetMail, sendLoanNotificationMail, sendWelcomeMail };

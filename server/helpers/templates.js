@@ -8,7 +8,7 @@ const passwordRecovery = (user, token) => `
     <link href="https://fonts.googleapis.com/css?family=Roboto+Mono:400,500" rel="stylesheet">
     <style>
       * {font-family: 'Roboto Mono',monospace;}
-      .container {width: 80%;margin: 0 auto;background: #fbfbfb;padding: 30px;color:#000}
+      .container {width: 80%; max-width: 30em; margin: 0 auto;background: #fbfbfb;padding: 30px;color:#000}
       .username {font-size: 1rem;}
       .message{font-size: 1rem;line-height: 1.5;}
       .reset-btn {display: inline-block;background: #A200A7;padding: 10px; color: #fff !important;text-decoration: none;font-size: 1rem;}
@@ -38,7 +38,7 @@ const notification = (user, status) => `
     <link href="https://fonts.googleapis.com/css?family=Roboto+Mono:400,500" rel="stylesheet">
     <style>
       * {font-family: 'Roboto Mono',monospace;}
-      .container {width: 80%;margin: 0 auto;background: #fbfbfb;padding: 30px;color:#000}
+      .container {width: 80%; max-width: 30em; margin: 0 auto;background: #fbfbfb;padding: 30px;color:#000}
       .username {font-size: 1rem;}
       .message{font-size: 1rem;line-height: 1.5;}
     </style>
@@ -54,4 +54,30 @@ const notification = (user, status) => `
   </body>
 </html>`;
 
-export default { passwordRecovery, notification };
+const welcome = user => `
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link href="https://fonts.googleapis.com/css?family=Roboto+Mono:400,500" rel="stylesheet">
+    <style>
+      * {font-family: 'Roboto Mono',monospace;}
+      .container {width: 80%; max-width: 30em; margin: 0 auto;background: #fbfbfb;padding: 30px;color:#000}
+      .username {font-size: 0.8rem;}
+      .message{font-size: 1rem;line-height: 1.5;}
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>Quick-Credit</h2>
+      <h3 class="username">Hello ${user.firstName},</h3>
+      <p class="message">
+      Welcome to Quick-Credit...
+      </p>
+    </div>
+  </body>
+</html>`;
+
+export default { passwordRecovery, notification, welcome };
