@@ -263,7 +263,31 @@ const getRepayments = async (req, res) => {
   }
 };
 
-
+// get user loan
+const getUserLoan = async (req, res) => {
+  const { email } = req.user;
+  // check if loan exists and belongs to user
+  try {
+    const query = {
+      text: `SELECT loans.id, "userEmail", "firstName", "lastName", users.status AS "userStatus", loans.status, repaid, tenor, amount::float, "paymentInstallment"::float, balance::float, interest::float, loans."createdOn"
+      FROM loans 
+      JOIN users ON users.email = "userEmail"
+      WHERE email = $1`,
+      values: [email],
+    };
+    const result = await pool.query(query);
+    return res.json({
+      status: 200,
+      data: result.rows,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      status: 500,
+      error: 'Internal server error',
+    });
+  }
+};
 export default {
-  createLoan, getAllLoans, getSpecificLoan, updateLoanStatus, repayLoan, getRepayments,
+  createLoan, getAllLoans, getSpecificLoan, updateLoanStatus, repayLoan, getRepayments, getUserLoan,
 };
