@@ -1,0 +1,344 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Montserrat', monospace;
+  color: #333;
+}
+body {
+  height: 100vh;
+  width: 100%
+}
+
+nav {
+  width: 100%;
+  display: flex;
+  align-items: baseline;
+  padding: 1.6em 4em;
+  box-shadow: 0 4px 5px -5px rgb(173, 172, 172);
+  position: fixed;
+  background-color: white;
+  z-index: 100;
+}
+.nav-heading a{
+  text-decoration: none;
+}
+.nav-toggle {
+ display: none;
+}
+
+.container {
+  display: flex;
+}
+.side-panel {
+  flex-basis: 25%;
+  background-color: rgb(107, 107, 107);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* padding-top: 3em; */
+  border-right: 1px solid rgb(107, 107, 107);
+  position: fixed;
+  top: 5em;
+  width: 25%;
+}
+.avatar {
+  width: 8em;
+  height: 8em;
+  border: 1px solid rgb(189, 187, 187);
+  border-radius: 50%;
+  overflow: hidden;
+  padding-top: 0.3em;
+  margin-top: 0.5em;
+}
+.admin-heading {
+  color: white;
+  margin-top: 1.7em;
+  margin-bottom: 0.6em;
+  font-size: 1.2em;
+  letter-spacing: 1.5px;
+  border-bottom: 2.5px solid white;
+  padding-bottom: 3px;
+}
+.admin-name {
+  /* margin: 1.5em 0; */
+  font-size: 1.4em;
+  color: white;
+  margin-bottom: 1em;
+  margin-top: 0.5em;
+}
+hr {
+  width: 100%;
+  border: 0.7px solid rgb(85, 84, 84);
+  margin-bottom: 1.3em;
+}
+.loan-link {
+  text-decoration: none;
+  font-size: 1.4em;
+  padding-top: 0.3em;
+  padding-bottom: 0.5em;
+  margin-bottom: 0.8em;
+  color: white;
+  display: block;
+  width: 100%;
+  text-align: center;
+}
+.loan-item {
+  color: white;
+}
+.loan-link.logout {
+  width: 70%;
+}
+.loan-link:hover {
+  background-color: rgb(140, 143, 140);
+}
+.loan-item.all_loans {
+  padding-bottom: 1.6px;
+  border-bottom: 4px solid rgb(255, 255, 255)
+}
+.loan-item.current {
+  padding-bottom: 1.6px;
+  border-bottom: 4px solid rgb(255, 255, 0)
+}
+.loan-item.repaid {
+  padding-bottom: 1.6px;
+  border-bottom: 4px solid rgb(9, 255, 0)
+}
+.loan-item.client {
+  padding-bottom: 1.6px;
+  border-bottom: 4px solid rgb(255, 255, 255)
+}
+.loan-link.logout {
+  padding: 0.3em 0.6em;
+  border: 2px solid white;
+}
+.main-panel {
+  flex-basis: 75%;
+  position: relative;
+  left: 25%;
+  top: 5em;
+  height: 100vh;
+}
+.main-panel__heading {
+  text-align: center;
+  font-weight: 700;
+  font-size: 1.5em;
+  margin-top: 1.2em;
+  margin-bottom: 1em;
+}
+/* table */
+.table-wrapper {
+  padding: 0 1em;
+}
+table {
+  border-collapse: collapse;
+}
+table {
+  /* border: 1px solid #eee; */
+  width: 100%;
+  max-width: 60em;
+  margin: auto;
+  padding: 2em;
+}
+th {
+  text-align: left;
+  font-weight: 700;
+  font-size: 1.2em;
+  background-color: rgb(100, 100, 100);
+  color: white;
+}
+th, td {
+  padding: 0.8em;
+}
+tr:nth-child(odd) {
+  background-color: rgb(247, 247, 247);
+}
+/* modify balance, status and amount fields */
+td:nth-child(4) {
+  font-weight: 700;
+  color: rgb(23, 180, 23);
+}
+/* td:nth-child(2) {
+  font-weight: 700;
+} */
+td:nth-child(5) {
+  font-weight: 600;
+  color: rgb(101, 101, 255);
+  position: relative;
+}
+.details-link {
+  display: block;
+  text-align: center;
+  text-decoration: none;
+  font-size: 0.9em;
+  color: white;
+  background-color: rgb(60, 60, 231);
+  padding: 0.3em 0.7em;
+}
+
+/* client verify table */
+.client-table__verify button {
+  padding: 0.5em 1em;
+  border: none;
+  background-color: rgb(9, 211, 9);
+  color: white;
+  cursor: pointer;
+}
+
+.verified-image {
+  width: 1.3em;
+  vertical-align: bottom;
+  margin-left: 2px;
+}
+
+/*media queries*/
+@media only screen and (max-width: 600px) {
+  .side-panel {
+    /* display: none; */
+    display: flex;
+    position: fixed;
+    width: 80%;
+    z-index: 5;
+    height: 100%;
+    top: 76px;
+    left: -80%;
+    transition: all 1s;
+  }
+  .nav-toggle {
+    display: block;
+    margin-right: 1.5em;
+  }
+  nav {
+    padding: 1.5em;
+    background-color: white;
+    position: fixed;
+    z-index: 100;
+  }
+  .nav-heading {
+    margin-left: 1em;
+  }
+  .side-panel.responsive {
+    left: 0;
+  }
+  .avatar {
+    width: 6em;
+    height: 6em;
+  }
+  .admin-heading {
+    margin-top: 1.3em;
+  }
+  .loan-link {
+    margin-bottom: 0.5em;
+  }
+  .main-panel {
+    flex-basis: 100%;
+    position: relative;
+    top: 76px;
+    left: 0;
+    z-index: 1;
+  }
+
+  /* responsive table media queries*/
+  thead {
+    display: none;
+  }
+  
+  tr {
+    display: block;
+    position: relative;
+    margin-bottom: 1em;
+    box-shadow: 0 0 4px rgb(199, 199, 199);
+    padding-left: 0.7em;
+  }
+  td {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0.5em;
+  }
+  .table-body-wrapper {
+    padding: 1em;
+  }
+  table {
+    padding: 2em;
+  }
+  .loan-cell::before {
+    flex-basis: 40%;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.7em;
+    color: rgb(139, 138, 138);
+  }
+  .loan-cell:nth-child(6){
+    position: absolute;
+    bottom: 0;
+    right: 2em;
+  }
+  .loan-cell:nth-child(1):before {content: "Client"}
+  .loan-cell:nth-child(2):before {content: "Amount"}
+  .loan-cell:nth-child(3):before {content: "Duration"}
+  .loan-cell:nth-child(4):before {content: "Balance"}
+  .loan-cell:nth-child(5):before {content: "Status"}
+
+  .client-cell::before {
+    flex-basis: 40%;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.7em;
+    color: rgb(139, 138, 138);
+  }
+  .client-cell:nth-child(1):before {content: "Client"}
+  .client-cell:nth-child(2):before {content: "E-mail"}
+  .client-cell:nth-child(3):before {content: "Address"}
+}
+
+@media only screen and (min-device-width: 600px) and (max-device-width: 1024px) {
+  .side-panel {
+    display: flex;
+    position: fixed;
+    width: 60%;
+    z-index: 5;
+    height: 100%;
+    top: 76px;
+    left: -60%;
+    transition: all 1s;
+  }
+  .nav-toggle {
+    display: block;
+    margin-right: 1.5em;
+    margin-left: 1em;
+  }
+  nav {
+    padding: 1.5em;
+    background-color: white;
+    position: fixed;
+    z-index: 100;
+  }
+  .nav-heading {
+    width: 90%;
+    text-align: center;
+  }
+  .side-panel.responsive {
+    left: 0;
+  }
+  .main-panel {
+    flex-basis: 100%;
+    position: relative;
+    top: 76px;
+    left: 0;
+    z-index: 1;
+  }
+}
+@media only screen and (min-device-width: 1500px) {
+  .top-container {
+    width: 100%;
+    max-width: 1500px;
+    margin: auto;
+    border: 1px solid #eee;
+    background-color: white;
+  }
+  body {
+    background-color: #eee;
+  }
+}
