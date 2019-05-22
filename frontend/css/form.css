@@ -112,7 +112,19 @@ footer p {
   font-size: 1.2em;
   text-align: center;
 }
-
+/* modal */
+.modal {
+  padding: 0.3em;
+  background-color: rgb(214, 102, 102);
+  border-radius: 5px;
+  margin-bottom: 0.5em;
+  display: none;
+}
+.modal p {
+  margin-top: 0;
+  padding: 0.2em;
+  color: white;
+}
 @media only screen and (max-device-width: 600px) {
   .nav-toggle {
     display: block;
