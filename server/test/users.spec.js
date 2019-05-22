@@ -318,7 +318,7 @@ describe('User reset password test', () => {
       })
       .end((err, res) => {
         expect(res.status).to.equal(400);
-        expect(res.body.error).to.equal('Password does not match');
+        expect(res.body.error).to.equal('Passwords do not match');
         done();
       });
   });

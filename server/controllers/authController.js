@@ -118,6 +118,12 @@ const verifyClient = async (req, res) => {
         error: 'Client does not exist',
       });
     }
+    if (client.rows[0].status === 'verified') {
+      return res.status(409).json({
+        status: 409,
+        error: 'User is already verified',
+      });
+    }
     const query = {
       text: 'UPDATE users SET status = $1 WHERE email = $2 RETURNING *',
       values: [status, email],
