@@ -139,6 +139,14 @@ const updateLoanStatus = async (req, res) => {
         error: 'Loan does not exist',
       });
     }
+    // check if user if verified
+    const userResult = await pool.query('SELECT status FROM users WHERE email = $1', [loan.rows[0].userEmail]);
+    if (userResult.rows[0].status !== 'verified') {
+      return res.status(400).json({
+        status: 400,
+        error: 'User is not verified',
+      });
+    }
     // update loan status
     const query = {
       text: 'UPDATE loans SET status = $1 WHERE id = $2 RETURNING id, "userEmail", status, repaid, tenor, amount::float, "paymentInstallment"::float, balance::float, interest::float, "createdOn"',
