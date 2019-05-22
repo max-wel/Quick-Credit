@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet">
+  <link rel="stylesheet" href="./css/admin.css">
+  <title>Quick-Credit</title>
+</head>
+<body>
+  <div class="top-container">
+    <nav>
+      <div class="nav-toggle"><a href="#"><img src="./img/icon-menu.svg"></a></div>
+      <h2 class="nav-heading"><a href="index.html">Quick-Credit</a></h2>
+    </nav>
+    
+    <div class="container">
+      <div class="side-panel">
+        <h3 class="admin-heading">ADMIN</h3>
+        <div class="avatar"><img src="./img/boy.svg" alt=""></div>
+        
+        <p class="admin-name">Sneakymaxy</p>
+        <hr>
+        <a href="admin-dashboard.html" class="loan-link"><span class="loan-item">All Loans</span></a>
+        <a href="current-loans.html" class="loan-link"><span class="loan-item current">Current Loans</span></a>
+        <a href="repaid-loans.html" class="loan-link"><span class="loan-item">Repaid Loans</span></a>
+        <a href="verify-users.html" class="loan-link"><span class="loan-item">Clients</span></a>
+        <a href="login.html" class="loan-link logout">Logout</a>
+      </div>
+    
+      <div class="main-panel">
+        <h3 class="main-panel__heading">Current Loans</h3>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Clients</th>
+                <th>Amount</th>
+                <th>Duration</th>
+                <th>Balance</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+    
+            <tbody>
+              <tr>
+                <td class="loan-cell">Rigatoni</td>
+                <td class="loan-cell">&#8358;4089.90</td>
+                <td class="loan-cell">12 months</td>
+                <td class="loan-cell">&#8358;678.34</td>
+                <td class="loan-cell">Pending</td>
+                <td class="loan-cell"><a href="details.html" class="details-link">Details</a></td>
+              </tr>
+              <tr>
+                <td class="loan-cell">Rigatoni</td>
+                <td class="loan-cell">&#8358;4089.90</td>
+                <td class="loan-cell">12 months</td>
+                <td class="loan-cell">&#8358;678.34</td>
+                <td class="loan-cell">Pending</td>
+                <td class="loan-cell"><a href="details.html" class="details-link">Details</a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+    
+      </div>
+    </div>
+  </div>
+    
+  <script src="./js/side-nav.js"></script>
+</body>
+</html>
