@@ -19,6 +19,7 @@ const createModal = ({ error }) => {
 const signup = (e) => {
   e.preventDefault();
   signupBtn.textContent = 'Loading...';
+  signupBtn.style.backgroundColor = '#747A80';
   // populate post body
 
   const body = {
@@ -39,6 +40,7 @@ const signup = (e) => {
     .then(res => res.json())
     .then((response) => {
       signupBtn.textContent = 'Sign Up';
+      signupBtn.style.backgroundColor = 'rgb(28, 55, 206)';
       if (response.status !== 201) {
         createModal(response);
         return;

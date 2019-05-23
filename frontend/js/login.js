@@ -16,6 +16,7 @@ const createModal = ({ error }) => {
 const login = (e) => {
   e.preventDefault();
   loginBtn.textContent = 'Loading...';
+  loginBtn.style.backgroundColor = '#747A80';
   // populate body
   const body = {
     email: email.value,
@@ -32,6 +33,7 @@ const login = (e) => {
     .then(res => res.json())
     .then((response) => {
       loginBtn.textContent = 'Login';
+      loginBtn.style.backgroundColor = 'rgb(28, 55, 206)';
       if (response.status !== 200) {
         createModal(response);
         return;

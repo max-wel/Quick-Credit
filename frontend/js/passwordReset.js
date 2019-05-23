@@ -18,7 +18,7 @@ const createModal = ({ error }) => {
 };
 
 const createSuccessModal = () => {
-  successModal.innerHTML = '<p>Password reset mail sent. Please check email</p>';
+  successModal.innerHTML = '<p>Password reset successful</p>';
   successModal.style.display = 'block';
   successModal.style.backgroundColor = '#00FC18';
   setTimeout(() => {
@@ -48,6 +48,7 @@ const resetPassword = (e) => {
         return;
       }
       createSuccessModal();
+      window.location.href = 'login.html';
     })
     .catch(error => console.log(error));
 };
