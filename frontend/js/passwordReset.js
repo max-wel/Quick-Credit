@@ -48,7 +48,6 @@ const resetPassword = (e) => {
         return;
       }
       createSuccessModal();
-      window.location.href = 'login.html';
     })
     .catch(error => console.log(error));
 };
