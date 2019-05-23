@@ -42,7 +42,6 @@ const userSignup = async (req, res) => {
       },
     });
   } catch (error) {
-    console.log(error);
     return res.status(500).json({
       status: 500,
       error: 'Internal server error',
@@ -91,7 +90,6 @@ const userSignin = async (req, res) => {
       },
     });
   } catch (error) {
-    console.log(error);
     return res.status(500).json({
       status: 500,
       error: 'Internal server error',
@@ -134,7 +132,6 @@ const verifyClient = async (req, res) => {
       data: result.rows[0],
     });
   } catch (error) {
-    console.log(error);
     return res.status(500).json({
       status: 500,
       error: 'Internal server error',
@@ -171,7 +168,6 @@ const forgotPassword = async (req, res) => {
       },
     });
   } catch (error) {
-    console.log(error);
     return res.status(500).json({
       status: 500,
       error: 'Internal server error',
@@ -222,7 +218,6 @@ const resetPassword = async (req, res) => {
         error: 'Expired reset link',
       });
     }
-    console.log(error);
     return res.status(500).json({
       status: 500,
       error: 'Internal server error',
@@ -239,7 +234,6 @@ const getAllUsers = async (req, res) => {
       data: users,
     });
   } catch (error) {
-    console.log(error);
     return res.status(500).json({
       status: 500,
       error: 'Internal server error',
