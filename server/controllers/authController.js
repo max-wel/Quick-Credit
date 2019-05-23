@@ -18,9 +18,9 @@ const userSignup = async (req, res) => {
   try {
     const user = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
     if (user.rows[0]) {
-      return res.status(400).json({
-        status: 400,
-        error: 'A user with this email exists',
+      return res.status(409).json({
+        status: 409,
+        error: 'A user with this email exist',
       });
     }
     const query = {
@@ -29,6 +29,8 @@ const userSignup = async (req, res) => {
     };
     const result = await pool.query(query);
     const token = generateToken.signToken({ email: result.rows[0].email, isAdmin: result.rows[0].isAdmin });
+    // send welcome mail
+    mailer.sendWelcomeMail(result.rows[0]);
     return res.status(201).json({
       status: 201,
       data: {
@@ -40,7 +42,6 @@ const userSignup = async (req, res) => {
       },
     });
   } catch (error) {
-    console.log(error);
     return res.status(500).json({
       status: 500,
       error: 'Internal server error',
@@ -85,10 +86,10 @@ const userSignin = async (req, res) => {
         firstName: result.rows[0].firstName,
         lastName: result.rows[0].lastName,
         email: result.rows[0].email,
+        isAdmin: result.rows[0].isAdmin,
       },
     });
   } catch (error) {
-    console.log(error);
     return res.status(500).json({
       status: 500,
       error: 'Internal server error',
@@ -115,6 +116,12 @@ const verifyClient = async (req, res) => {
         error: 'Client does not exist',
       });
     }
+    if (client.rows[0].status === 'verified') {
+      return res.status(409).json({
+        status: 409,
+        error: 'User is already verified',
+      });
+    }
     const query = {
       text: 'UPDATE users SET status = $1 WHERE email = $2 RETURNING *',
       values: [status, email],
@@ -125,7 +132,6 @@ const verifyClient = async (req, res) => {
       data: result.rows[0],
     });
   } catch (error) {
-    console.log(error);
     return res.status(500).json({
       status: 500,
       error: 'Internal server error',
@@ -162,7 +168,6 @@ const forgotPassword = async (req, res) => {
       },
     });
   } catch (error) {
-    console.log(error);
     return res.status(500).json({
       status: 500,
       error: 'Internal server error',
@@ -213,7 +218,22 @@ const resetPassword = async (req, res) => {
         error: 'Expired reset link',
       });
     }
-    console.log(error);
+    return res.status(500).json({
+      status: 500,
+      error: 'Internal server error',
+    });
+  }
+};
+
+const getAllUsers = async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM users WHERE "isAdmin" = false');
+    const users = result.rows;
+    return res.json({
+      status: 200,
+      data: users,
+    });
+  } catch (error) {
     return res.status(500).json({
       status: 500,
       error: 'Internal server error',
@@ -222,5 +242,5 @@ const resetPassword = async (req, res) => {
 };
 
 export default {
-  userSignup, userSignin, verifyClient, forgotPassword, resetPassword,
+  userSignup, userSignin, verifyClient, forgotPassword, resetPassword, getAllUsers,
 };

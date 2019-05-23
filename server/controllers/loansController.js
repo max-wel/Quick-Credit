@@ -33,7 +33,6 @@ const createLoan = async (req, res) => {
       data: result.rows[0],
     });
   } catch (error) {
-    console.log(error);
     return res.status(500).json({
       status: 500,
       error: 'Internal server error',
@@ -53,7 +52,10 @@ const getAllLoans = async (req, res) => {
   try {
     if (status === 'approved' && (repaid === 'true' || repaid === 'false')) {
       const query = {
-        text: 'SELECT id, "userEmail", status, repaid, tenor, amount::float, "paymentInstallment"::float, balance::float, interest::float, "createdOn" FROM loans WHERE status = $1 AND repaid = $2',
+        text: `SELECT loans.id, "firstName", "userEmail", loans.status, repaid, tenor, amount::float, "paymentInstallment"::float, balance::float, interest::float, loans."createdOn"
+        FROM loans 
+        JOIN users ON loans."userEmail" = users.email
+        WHERE loans.status = $1 AND repaid = $2`,
         values: [status, repaid],
       };
       const result = await pool.query(query);
@@ -62,13 +64,17 @@ const getAllLoans = async (req, res) => {
         data: result.rows,
       });
     }
-    const result = await pool.query('SELECT id, "userEmail", status, repaid, tenor, amount::float, "paymentInstallment"::float, balance::float, interest::float, "createdOn" FROM loans');
+    const query = {
+      text: `SELECT loans.id, "firstName", "userEmail", loans.status, repaid, tenor, amount::float, "paymentInstallment"::float, balance::float, interest::float, loans."createdOn"
+      FROM loans 
+      JOIN users ON loans."userEmail" = users.email`,
+    };
+    const result = await pool.query(query);
     return res.json({
       status: 200,
       data: result.rows,
     });
   } catch (error) {
-    console.log(error);
     return res.status(500).json({
       status: 500,
       error: 'Internal server error',
@@ -86,7 +92,10 @@ const getAllLoans = async (req, res) => {
 const getSpecificLoan = async (req, res) => {
   const loanId = parseInt(req.params.id, 10);
   const query = {
-    text: 'SELECT id, "userEmail", status, repaid, tenor, amount::float, "paymentInstallment"::float, balance::float, interest::float, "createdOn" FROM loans WHERE id = $1',
+    text: `SELECT loans.id, "firstName", "userEmail", loans.status, repaid, tenor, amount::float, "paymentInstallment"::float, balance::float, interest::float, loans."createdOn"
+    FROM loans 
+    JOIN users ON loans."userEmail" = users.email
+    WHERE loans.id = $1`,
     values: [loanId],
   };
   try {
@@ -126,6 +135,14 @@ const updateLoanStatus = async (req, res) => {
       return res.status(404).json({
         status: 404,
         error: 'Loan does not exist',
+      });
+    }
+    // check if user if verified
+    const userResult = await pool.query('SELECT status FROM users WHERE email = $1', [loan.rows[0].userEmail]);
+    if (userResult.rows[0].status !== 'verified') {
+      return res.status(400).json({
+        status: 400,
+        error: 'User is not verified',
       });
     }
     // update loan status
@@ -239,7 +256,7 @@ const getRepayments = async (req, res) => {
     if (loan.userEmail !== email) {
       return res.status(403).json({
         status: 403,
-        error: 'Access forbidden',
+        error: 'Loan does not belong to you',
       });
     }
     // get repayments
@@ -263,7 +280,29 @@ const getRepayments = async (req, res) => {
   }
 };
 
-
+// get user loan
+const getUserLoan = async (req, res) => {
+  const { email } = req.user;
+  try {
+    const query = {
+      text: `SELECT loans.id, "userEmail", "firstName", "lastName", users.status AS "userStatus", loans.status, repaid, tenor, amount::float, "paymentInstallment"::float, balance::float, interest::float, loans."createdOn"
+      FROM loans 
+      JOIN users ON users.email = "userEmail"
+      WHERE email = $1`,
+      values: [email],
+    };
+    const result = await pool.query(query);
+    return res.json({
+      status: 200,
+      data: result.rows,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: 500,
+      error: 'Internal server error',
+    });
+  }
+};
 export default {
-  createLoan, getAllLoans, getSpecificLoan, updateLoanStatus, repayLoan, getRepayments,
+  createLoan, getAllLoans, getSpecificLoan, updateLoanStatus, repayLoan, getRepayments, getUserLoan,
 };

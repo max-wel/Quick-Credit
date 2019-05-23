@@ -150,7 +150,7 @@ describe('Loan Tests', () => {
         .end((err, res) => {
           expect(res.status).to.equal(400);
           expect(res.body).to.have.property('error');
-          expect(res.body.error).to.equal('Invalid tenor');
+          expect(res.body.error).to.equal('Tenor should be between 1 to 12 months');
           done();
         });
     });
@@ -204,7 +204,7 @@ describe('Loan Tests', () => {
         .end((err, res) => {
           expect(res.status).to.equal(403);
           expect(res.body).to.have.property('error');
-          expect(res.body.error).to.equal('Access forbidden, admin only');
+          expect(res.body.error).to.equal('You do not have access to this resource');
           done();
         });
     });
@@ -254,6 +254,44 @@ describe('Loan Tests', () => {
           expect(res.status).to.equal(404);
           expect(res.body).to.have.property('error');
           expect(res.body.error).to.equal('No loan found');
+          done();
+        });
+    });
+  });
+
+  describe('Admin verify client', () => {
+    it('should return a verified client', (done) => {
+      request(app)
+        .patch('/api/v1/users/rigatoni@gmail.com/verify')
+        .set('x-access-token', adminToken)
+        .send({ status: 'verified' })
+        .end((err, res) => {
+          expect(res.status).to.equal(200);
+          expect(res.body).to.have.property('data');
+          done();
+        });
+    });
+    it('should return an error when passed invalid email', (done) => {
+      request(app)
+        .patch('/api/v1/users/qwerty@gmail.com/verify')
+        .set('x-access-token', adminToken)
+        .send({ status: 'verified' })
+        .end((err, res) => {
+          expect(res.status).to.equal(404);
+          expect(res.body).to.have.property('error');
+          expect(res.body.error).to.equal('Client does not exist');
+          done();
+        });
+    });
+    it('should return an error when passed invalid status', (done) => {
+      request(app)
+        .patch('/api/v1/users/rigatoni@gmail.com/verify')
+        .set('x-access-token', adminToken)
+        .send({ status: 'qweerty' })
+        .end((err, res) => {
+          expect(res.status).to.equal(400);
+          expect(res.body).to.have.property('error');
+          expect(res.body.error).to.equal('Invalid status');
           done();
         });
     });
@@ -401,45 +439,44 @@ describe('Loan Tests', () => {
         .end((err, res) => {
           expect(res.status).to.equal(403);
           expect(res.body).to.have.property('error');
-          expect(res.body.error).to.equal('Access forbidden');
+          expect(res.body.error).to.equal('Loan does not belong to you');
           done();
         });
     });
   });
 
-  describe('Admin verify client', () => {
-    it('should return a verified client', (done) => {
+  describe('Admin get all users', () => {
+    it('should return all users', (done) => {
       request(app)
-        .patch('/api/v1/users/rigatoni@gmail.com/verify')
+        .get('/api/v1/users')
         .set('x-access-token', adminToken)
-        .send({ status: 'verified' })
         .end((err, res) => {
           expect(res.status).to.equal(200);
           expect(res.body).to.have.property('data');
           done();
         });
     });
-    it('should return an error when passed invalid email', (done) => {
+    it('should return an error when non-admin tries to get all users', (done) => {
       request(app)
-        .patch('/api/v1/users/qwerty@gmail.com/verify')
-        .set('x-access-token', adminToken)
-        .send({ status: 'verified' })
+        .get('/api/v1/users')
+        .set('x-access-token', userToken1)
         .end((err, res) => {
-          expect(res.status).to.equal(404);
+          expect(res.status).to.equal(403);
           expect(res.body).to.have.property('error');
-          expect(res.body.error).to.equal('Client does not exist');
+          expect(res.body.error).to.equal('You do not have access to this resource');
           done();
         });
     });
-    it('should return an error when passed invalid status', (done) => {
+  });
+
+  describe('User get loan', () => {
+    it('should return all user loans', (done) => {
       request(app)
-        .patch('/api/v1/users/rigatoni@gmail.com/verify')
-        .set('x-access-token', adminToken)
-        .send({ status: 'qweerty' })
+        .get('/api/v1/user/loans')
+        .set('x-access-token', userToken1)
         .end((err, res) => {
-          expect(res.status).to.equal(400);
-          expect(res.body).to.have.property('error');
-          expect(res.body.error).to.equal('Invalid status');
+          expect(res.status).to.equal(200);
+          expect(res.body).to.have.property('data');
           done();
         });
     });

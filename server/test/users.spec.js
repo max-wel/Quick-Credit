@@ -67,9 +67,9 @@ describe('POST user signup', () => {
       .post('/api/v1/auth/signup')
       .send(validUser1)
       .end((err, res) => {
-        expect(res.status).to.equal(400);
+        expect(res.status).to.equal(409);
         expect(res.body).to.have.property('error');
-        expect(res.body.error).to.equal('A user with this email exists');
+        expect(res.body.error).to.equal('A user with this email exist');
         done();
       });
   });
@@ -318,7 +318,7 @@ describe('User reset password test', () => {
       })
       .end((err, res) => {
         expect(res.status).to.equal(400);
-        expect(res.body.error).to.equal('Password does not match');
+        expect(res.body.error).to.equal('Passwords do not match');
         done();
       });
   });
