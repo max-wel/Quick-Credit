@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,13 +9,14 @@
   <link rel="stylesheet" href="./css/user-profile.css">
   <title>Quick-Credit</title>
 </head>
+
 <body>
   <div class="top-container">
     <nav>
       <div class="nav-toggle"><a href="#"><img src="./img/icon-menu.svg"></a></div>
       <h2 class="nav-heading"><a href="index.html">Quick-Credit</a></h2>
     </nav>
-    
+
     <div class="container">
       <div class="side-panel">
         <div class="avatar"><img src="./img/boy.svg" alt=""></div>
@@ -24,7 +26,7 @@
         <a href="loan-apply.html" class="loan-link"><span class="loan-item active">Request Loan</span></a>
         <a href="login.html" class="loan-link"><span class="loan-item">Logout</span></a>
       </div>
-    
+
       <div class="main-panel">
         <h2 class="main-panel__heading">LOAN APPLICATION</h2>
         <div class="form-wrapper">
@@ -33,6 +35,7 @@
             <input type="number" id="loan-amount" placeholder="In Naira" required>
             <label for="loan-duration">Duration</label>
             <input type="number" min="1" max="12" id="loan-duration" placeholder="In Months" required>
+            <div class="modal"></div>
             <button class="loan-apply__btn">Apply</button>
           </form>
         </div>
@@ -40,5 +43,7 @@
     </div>
   </div>
   <script src="./js/side-nav.js"></script>
+  <script src="./js/createLoan.js"></script>
 </body>
+
 </html>
