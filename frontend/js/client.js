@@ -65,7 +65,7 @@ const getUserLoans = async () => {
   });
 };
 
-const getHistory = async (id) => {
+const getHistory = (id) => {
   localStorage.setItem('loanId', id);
   window.location.href = 'history.html';
 };
