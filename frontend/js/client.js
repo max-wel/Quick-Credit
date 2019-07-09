@@ -1,17 +1,16 @@
 const clientName = document.querySelector('.user-name');
 const loanContainer = document.querySelector('.loan-container');
 
-const getUserLoans = async (e) => {
-  e.preventDefault();
-  const url = 'https://quick-credit-max.herokuapp.com/api/v1/user/loans';
+const getUserLoans = async () => {
   const token = window.localStorage.getItem('token');
   const currentUser = window.localStorage.getItem('username');
   if (!token) {
     window.location.href = 'login.html';
-    return;
   }
   // set client name
   clientName.textContent = currentUser;
+
+  const url = 'https://quick-credit-max.herokuapp.com/api/v1/user/loans';
 
   const request = new Request(url, {
     method: 'GET',
@@ -66,8 +65,9 @@ const getUserLoans = async (e) => {
   });
 };
 
-const getHistory = (id) => {
-  console.log(id);
+const getHistory = async (id) => {
+  localStorage.setItem('loanId', id);
+  window.location.href = 'history.html';
 };
 
 window.addEventListener('load', getUserLoans);

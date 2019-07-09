@@ -108,7 +108,7 @@ hr {
   margin-top: 1em;
 }
 
-.loan-container {
+.loan-container, .repayments-container {
   width: 100%;
   max-width: 55em;
   margin: 1.2em auto;
