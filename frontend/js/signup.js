@@ -46,6 +46,7 @@ const signup = (e) => {
         return;
       }
       window.localStorage.setItem('token', response.data.token);
+      window.localStorage.setItem('username', response.data.firstName);
       window.location.href = 'client-dashboard.html';
     })
     .catch(error => console.log(error));

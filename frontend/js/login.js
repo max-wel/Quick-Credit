@@ -39,6 +39,7 @@ const login = (e) => {
         return;
       }
       window.localStorage.setItem('token', response.data.token);
+      window.localStorage.setItem('username', response.data.firstName);
       // check if it's admin
       if (response.data.isAdmin) {
         window.location.href = 'admin-dashboard.html';
