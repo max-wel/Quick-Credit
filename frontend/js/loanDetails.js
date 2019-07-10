@@ -1,8 +1,11 @@
 const loanDetails = document.querySelector('.loan-details');
+const clientName = document.querySelector('.repay-modal__name');
+const paidAmount = document.querySelector('#repay-amount');
+const repayForm = document.querySelector('form');
+const loanId = window.localStorage.getItem('loanId');
+const token = window.localStorage.getItem('token');
 
 const getLoanDetails = async () => {
-  const token = window.localStorage.getItem('token');
-  const loanId = window.localStorage.getItem('loanId');
   if (!token) {
     window.location.href = 'login.html';
   }
@@ -20,6 +23,8 @@ const getLoanDetails = async () => {
   });
   const response = await fetch(request);
   const { status, error, data: loan } = await response.json();
+
+  clientName.textContent = loan.firstName;
   if (status !== 200) {
     alert(error);
     return;
@@ -57,4 +62,27 @@ const getLoanDetails = async () => {
     `;
 };
 
+const repayLoan = async (e) => {
+  e.preventDefault();
+  const url = `https://quick-credit-max.herokuapp.com/api/v1/loans/${loanId}/repayment`;
+  const body = { paidAmount: paidAmount.value };
+  const request = new Request(url, {
+    method: 'POST',
+    mode: 'cors',
+    headers: {
+      'x-access-token': token,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
+  });
+  const response = await fetch(request);
+  const { status, error } = await response.json();
+  if (status !== 201) {
+    alert(error);
+    return;
+  }
+  alert('Payment Successful');
+};
+
 window.addEventListener('load', getLoanDetails);
+repayForm.addEventListener('submit', repayLoan);
