@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,27 +9,28 @@
   <link rel="stylesheet" href="./css/admin.css">
   <title>Quick-Credit</title>
 </head>
+
 <body>
   <div class="top-container">
     <nav>
       <div class="nav-toggle"><a href="#"><img src="./img/icon-menu.svg"></a></div>
       <h2 class="nav-heading"><a href="index.html">Quick-Credit</a></h2>
     </nav>
-    
+
     <div class="container">
       <div class="side-panel">
         <h3 class="admin-heading">ADMIN</h3>
         <div class="avatar"><img src="./img/boy.svg" alt=""></div>
-        
+
         <p class="admin-name">Sneakymaxy</p>
         <hr>
         <a href="admin-dashboard.html" class="loan-link"><span class="loan-item">All Loans</span></a>
         <a href="current-loans.html" class="loan-link"><span class="loan-item">Current Loans</span></a>
         <a href="repaid-loans.html" class="loan-link"><span class="loan-item">Repaid Loans</span></a>
         <a href="verify-users.html" class="loan-link"><span class="loan-item client">Clients</span></a>
-        <a href="login.html" class="loan-link logout">Logout</a>
+        <a href="login.html" class="loan-link logout" id='logout-btn'>Logout</a>
       </div>
-    
+
       <div class="main-panel">
         <h3 class="main-panel__heading">Clients</h3>
         <div class="table-wrapper">
@@ -41,28 +43,18 @@
                 <th>Action</th>
               </tr>
             </thead>
-    
-            <tbody>
-              <tr>
-                <td class="client-cell"><span>Rigatoni<img src="./img/verified.svg" class="verified-image"></span></td>
-                <td class="client-cell">sneaky@gmail.com</td>
-                <td class="client-cell">21, Vicarage road Watford</td>
-                <td class="client-cell client-table__verify"><button>Verify</button></td>
-              </tr>
-              <tr>
-                <td class="client-cell"><span>Macaroni<img src="./img/verified.svg" class="verified-image"></span></td>
-                <td class="client-cell">sneaky@gmail.com</td>
-                <td class="client-cell">21, Vicarage road Watford</td>
-                <td class="client-cell client-table__verify"><button>Verify</button></td>
-              </tr>
-            </tbody>
+
+            <tbody></tbody>
           </table>
         </div>
-    
+
       </div>
     </div>
   </div>
-    
+
   <script src="./js/side-nav.js"></script>
+  <script src="./js/verifyUsers.js"></script>
+  <script src="./js/logout.js"></script>
 </body>
+
 </html>
