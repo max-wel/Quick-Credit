@@ -26,7 +26,7 @@ describe('Loan Tests', () => {
       .post('/api/v1/auth/signin')
       .send(user1)
       .end((err1, res1) => {
-        userToken1 = res1.body.data.token;
+        userToken1 = `Bearer ${res1.body.data.token}`;
         expect(res1.status).to.equal(200);
         expect(res1.body).to.have.property('data');
 
@@ -34,7 +34,7 @@ describe('Loan Tests', () => {
           .post('/api/v1/auth/signin')
           .send(user2)
           .end((err2, res2) => {
-            userToken2 = res2.body.data.token;
+            userToken2 = `Bearer ${res2.body.data.token}`;
             expect(res2.status).to.equal(200);
             expect(res2.body).to.have.property('data');
 
@@ -42,7 +42,7 @@ describe('Loan Tests', () => {
               .post('/api/v1/auth/signin')
               .send(admin)
               .end((adminErr, adminRes) => {
-                adminToken = adminRes.body.data.token;
+                adminToken = `Bearer ${adminRes.body.data.token}`;
                 expect(adminRes.status).to.equal(200);
                 expect(adminRes.body).to.have.property('data');
                 done();
@@ -72,7 +72,7 @@ describe('Loan Tests', () => {
     it('should return an error when an invalid token is supplied', (done) => {
       request(app)
         .get('/api/v1/loans')
-        .set('x-access-token', 'jdkjalkdld.dkjakdkfa')
+        .set('Authorization', 'jdkjalkdld.dkjakdkfa')
         .end((err, res) => {
           expect(res.status).to.equal(401);
           expect(res.body).to.have.property('error');
@@ -86,7 +86,7 @@ describe('Loan Tests', () => {
     it('should return a new loan application', (done) => {
       request(app)
         .post('/api/v1/loans')
-        .set('x-access-token', userToken1)
+        .set('Authorization', userToken1)
         .send({
           tenor: 5,
           amount: 1500.00,
@@ -97,7 +97,7 @@ describe('Loan Tests', () => {
 
           request(app)
             .post('/api/v1/loans')
-            .set('x-access-token', userToken2)
+            .set('Authorization', userToken2)
             .send({
               tenor: 5,
               amount: 1500.00,
@@ -112,7 +112,7 @@ describe('Loan Tests', () => {
     it('should return an error if user1 tries to request for more than one loan', (done) => {
       request(app)
         .post('/api/v1/loans')
-        .set('x-access-token', userToken1)
+        .set('Authorization', userToken1)
         .send({
           tenor: 5,
           amount: 1500.00,
@@ -127,7 +127,7 @@ describe('Loan Tests', () => {
     it('should return an error when passed empty tenor', (done) => {
       request(app)
         .post('/api/v1/loans')
-        .set('x-access-token', userToken1)
+        .set('Authorization', userToken1)
         .send({
           tenor: '',
           amount: 1500.00,
@@ -142,7 +142,7 @@ describe('Loan Tests', () => {
     it('should return an error when passed invalid tenor', (done) => {
       request(app)
         .post('/api/v1/loans')
-        .set('x-access-token', userToken1)
+        .set('Authorization', userToken1)
         .send({
           tenor: 13,
           amount: 1500.00,
@@ -157,7 +157,7 @@ describe('Loan Tests', () => {
     it('should return an error when passed empty amount', (done) => {
       request(app)
         .post('/api/v1/loans')
-        .set('x-access-token', userToken1)
+        .set('Authorization', userToken1)
         .send({
           tenor: 3,
           amount: '',
@@ -172,7 +172,7 @@ describe('Loan Tests', () => {
     it('should return an error when passed invalid amount', (done) => {
       request(app)
         .post('/api/v1/loans')
-        .set('x-access-token', userToken1)
+        .set('Authorization', userToken1)
         .send({
           tenor: 3,
           amount: '150A.00',
@@ -180,7 +180,7 @@ describe('Loan Tests', () => {
         .end((err, res) => {
           expect(res.status).to.equal(400);
           expect(res.body).to.have.property('error');
-          expect(res.body.error).to.equal('Invalid amount');
+          expect(res.body.error).to.equal('Invalid amount format');
           done();
         });
     });
@@ -190,7 +190,7 @@ describe('Loan Tests', () => {
     it('should return all loans', (done) => {
       request(app)
         .get('/api/v1/loans')
-        .set('x-access-token', adminToken)
+        .set('Authorization', adminToken)
         .end((err, res) => {
           expect(res.status).to.equal(200);
           expect(res.body).to.have.property('data');
@@ -200,7 +200,7 @@ describe('Loan Tests', () => {
     it('should return an error when non-admin tries to get all loans', (done) => {
       request(app)
         .get('/api/v1/loans')
-        .set('x-access-token', userToken1)
+        .set('Authorization', userToken1)
         .end((err, res) => {
           expect(res.status).to.equal(403);
           expect(res.body).to.have.property('error');
@@ -214,7 +214,7 @@ describe('Loan Tests', () => {
     it('should return all current loans', (done) => {
       request(app)
         .get('/api/v1/loans/?status=approved&repaid=false')
-        .set('x-access-token', adminToken)
+        .set('Authorization', adminToken)
         .end((err, res) => {
           expect(res.status).to.equal(200);
           expect(res.body).to.have.property('data');
@@ -226,7 +226,7 @@ describe('Loan Tests', () => {
     it('should return all repaid loans', (done) => {
       request(app)
         .get('/api/v1/loans/?status=approved&repaid=true')
-        .set('x-access-token', adminToken)
+        .set('Authorization', adminToken)
         .end((err, res) => {
           expect(res.status).to.equal(200);
           expect(res.body).to.have.property('data');
@@ -239,7 +239,7 @@ describe('Loan Tests', () => {
     it('should return a specific loan', (done) => {
       request(app)
         .get('/api/v1/loans/1')
-        .set('x-access-token', adminToken)
+        .set('Authorization', adminToken)
         .end((err, res) => {
           expect(res.status).to.equal(200);
           expect(res.body).to.have.property('data');
@@ -249,7 +249,7 @@ describe('Loan Tests', () => {
     it('should return an error when passed invalid loan-id', (done) => {
       request(app)
         .get('/api/v1/loans/20')
-        .set('x-access-token', adminToken)
+        .set('Authorization', adminToken)
         .end((err, res) => {
           expect(res.status).to.equal(404);
           expect(res.body).to.have.property('error');
@@ -263,7 +263,7 @@ describe('Loan Tests', () => {
     it('should return a verified client', (done) => {
       request(app)
         .patch('/api/v1/users/rigatoni@gmail.com/verify')
-        .set('x-access-token', adminToken)
+        .set('Authorization', adminToken)
         .send({ status: 'verified' })
         .end((err, res) => {
           expect(res.status).to.equal(200);
@@ -274,7 +274,7 @@ describe('Loan Tests', () => {
     it('should return an error when passed invalid email', (done) => {
       request(app)
         .patch('/api/v1/users/qwerty@gmail.com/verify')
-        .set('x-access-token', adminToken)
+        .set('Authorization', adminToken)
         .send({ status: 'verified' })
         .end((err, res) => {
           expect(res.status).to.equal(404);
@@ -286,7 +286,7 @@ describe('Loan Tests', () => {
     it('should return an error when passed invalid status', (done) => {
       request(app)
         .patch('/api/v1/users/rigatoni@gmail.com/verify')
-        .set('x-access-token', adminToken)
+        .set('Authorization', adminToken)
         .send({ status: 'qweerty' })
         .end((err, res) => {
           expect(res.status).to.equal(400);
@@ -301,7 +301,7 @@ describe('Loan Tests', () => {
     it('should reject a loan application', (done) => {
       request(app)
         .patch('/api/v1/loans/1')
-        .set('x-access-token', adminToken)
+        .set('Authorization', adminToken)
         .send({ status: 'rejected' })
         .end((err, res) => {
           expect(res.status).to.equal(200);
@@ -313,7 +313,7 @@ describe('Loan Tests', () => {
     it('should approve a loan application', (done) => {
       request(app)
         .patch('/api/v1/loans/1')
-        .set('x-access-token', adminToken)
+        .set('Authorization', adminToken)
         .send({ status: 'approved' })
         .end((err, res) => {
           expect(res.status).to.equal(200);
@@ -325,7 +325,7 @@ describe('Loan Tests', () => {
     it('should return an error when passed invalid loan-id parameter', (done) => {
       request(app)
         .patch('/api/v1/loans/90')
-        .set('x-access-token', adminToken)
+        .set('Authorization', adminToken)
         .send({ status: 'approved' })
         .end((err, res) => {
           expect(res.status).to.equal(404);
@@ -337,7 +337,7 @@ describe('Loan Tests', () => {
     it('should return an error when status is neither approved/rejected', (done) => {
       request(app)
         .patch('/api/v1/loans/1')
-        .set('x-access-token', adminToken)
+        .set('Authorization', adminToken)
         .send({ status: 'something-else' })
         .end((err, res) => {
           expect(res.status).to.equal(400);
@@ -352,7 +352,7 @@ describe('Loan Tests', () => {
     it('should create a loan repayment', (done) => {
       request(app)
         .post('/api/v1/loans/1/repayment')
-        .set('x-access-token', adminToken)
+        .set('Authorization', adminToken)
         .send({ paidAmount: 1575.00 })
         .end((err, res) => {
           expect(res.status).to.equal(201);
@@ -363,7 +363,7 @@ describe('Loan Tests', () => {
     it('should return an error when passed invalid loan-id parameter', (done) => {
       request(app)
         .post('/api/v1/loans/90/repayment')
-        .set('x-access-token', adminToken)
+        .set('Authorization', adminToken)
         .send({ paidAmount: 400.00 })
         .end((err, res) => {
           expect(res.status).to.equal(404);
@@ -375,7 +375,7 @@ describe('Loan Tests', () => {
     it('should return an error if loan is not approved', (done) => {
       request(app)
         .post('/api/v1/loans/2/repayment')
-        .set('x-access-token', adminToken)
+        .set('Authorization', adminToken)
         .send({ paidAmount: '400.00' })
         .end((err, res) => {
           expect(res.status).to.equal(400);
@@ -387,7 +387,7 @@ describe('Loan Tests', () => {
     it('should return an error if loan has been repaid', (done) => {
       request(app)
         .post('/api/v1/loans/1/repayment')
-        .set('x-access-token', adminToken)
+        .set('Authorization', adminToken)
         .send({ paidAmount: '400.00' })
         .end((err, res) => {
           expect(res.status).to.equal(400);
@@ -399,12 +399,12 @@ describe('Loan Tests', () => {
     it('should return an error when passed an invalid repay amount', (done) => {
       request(app)
         .post('/api/v1/loans/2/repayment')
-        .set('x-access-token', adminToken)
+        .set('Authorization', adminToken)
         .send({ paidAmount: '400A.00' })
         .end((err, res) => {
           expect(res.status).to.equal(400);
           expect(res.body).to.have.property('error');
-          expect(res.body.error).to.equal('Invalid amount');
+          expect(res.body.error).to.equal('Invalid amount format');
           done();
         });
     });
@@ -414,7 +414,7 @@ describe('Loan Tests', () => {
     it('should return loan repayment history', (done) => {
       request(app)
         .get('/api/v1/loans/1/repayments')
-        .set('x-access-token', userToken1)
+        .set('Authorization', userToken1)
         .end((err, res) => {
           expect(res.status).to.equal(200);
           expect(res.body).to.have.property('data');
@@ -424,7 +424,7 @@ describe('Loan Tests', () => {
     it('should return an error when passed invalid loan id', (done) => {
       request(app)
         .get('/api/v1/loans/70/repayments')
-        .set('x-access-token', userToken1)
+        .set('Authorization', userToken1)
         .end((err, res) => {
           expect(res.status).to.equal(404);
           expect(res.body).to.have.property('error');
@@ -435,7 +435,7 @@ describe('Loan Tests', () => {
     it('should return an error if loan does not belong to user1', (done) => {
       request(app)
         .get('/api/v1/loans/1/repayments')
-        .set('x-access-token', userToken2)
+        .set('Authorization', userToken2)
         .end((err, res) => {
           expect(res.status).to.equal(403);
           expect(res.body).to.have.property('error');
@@ -449,7 +449,7 @@ describe('Loan Tests', () => {
     it('should return all users', (done) => {
       request(app)
         .get('/api/v1/users')
-        .set('x-access-token', adminToken)
+        .set('Authorization', adminToken)
         .end((err, res) => {
           expect(res.status).to.equal(200);
           expect(res.body).to.have.property('data');
@@ -459,7 +459,7 @@ describe('Loan Tests', () => {
     it('should return an error when non-admin tries to get all users', (done) => {
       request(app)
         .get('/api/v1/users')
-        .set('x-access-token', userToken1)
+        .set('Authorization', userToken1)
         .end((err, res) => {
           expect(res.status).to.equal(403);
           expect(res.body).to.have.property('error');
@@ -473,7 +473,7 @@ describe('Loan Tests', () => {
     it('should return all user loans', (done) => {
       request(app)
         .get('/api/v1/user/loans')
-        .set('x-access-token', userToken1)
+        .set('Authorization', userToken1)
         .end((err, res) => {
           expect(res.status).to.equal(200);
           expect(res.body).to.have.property('data');

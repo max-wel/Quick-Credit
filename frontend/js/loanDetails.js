@@ -19,7 +19,7 @@ const getLoanDetails = async () => {
   const request = new Request(url, {
     method: 'GET',
     headers: {
-      'x-access-token': token,
+      Authorization: `Bearer ${token}`,
     },
     mode: 'cors',
   });
@@ -74,7 +74,7 @@ const repayLoan = async (e) => {
     method: 'POST',
     mode: 'cors',
     headers: {
-      'x-access-token': token,
+      Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(body),
@@ -98,7 +98,7 @@ const handleLoanApproval = async () => {
     method: 'PATCH',
     mode: 'cors',
     headers: {
-      'x-access-token': token,
+      Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(body),
@@ -119,7 +119,7 @@ const handleLoanRejection = async () => {
     method: 'PATCH',
     mode: 'cors',
     headers: {
-      'x-access-token': token,
+      Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(body),

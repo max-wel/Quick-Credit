@@ -24,7 +24,7 @@ const loanApply = async (e) => {
     method: 'POST',
     mode: 'cors',
     headers: {
-      'x-access-token': token,
+      Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(body),
