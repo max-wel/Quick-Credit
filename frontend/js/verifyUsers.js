@@ -17,7 +17,7 @@ const getUsers = async () => {
   const request = new Request(apiUrl, {
     method: 'GET',
     headers: {
-      'x-access-token': token,
+      Authorization: `Bearer ${token}`,
     },
     mode: 'cors',
   });
@@ -54,7 +54,7 @@ const handleUserVerification = async (email, id) => {
     method: 'PATCH',
     mode: 'cors',
     headers: {
-      'x-access-token': token,
+      Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(body),
