@@ -12,7 +12,7 @@ const getRepaidLoans = async () => {
   const request = new Request(apiUrl, {
     method: 'GET',
     headers: {
-      'x-access-token': token,
+      Authorization: `Bearer ${token}`,
     },
     mode: 'cors',
   });

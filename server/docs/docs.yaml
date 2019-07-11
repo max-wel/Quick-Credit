@@ -12,7 +12,7 @@ basePath: /api/v1
 securityDefinitions:
   Bearer:
     type: apiKey
-    name: x-access-token
+    name: Authorization
     in: header
     
 tags:

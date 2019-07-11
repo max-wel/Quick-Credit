@@ -18,7 +18,9 @@ const loanValidator = (req, res, next) => {
     .withMessage('Amount is required')
     .trim()
     .matches(/^\d+(\.\d{0,2})?$/)
-    .withMessage('Invalid amount');
+    .withMessage('Invalid amount format')
+    .custom(value => value > 50)
+    .withMessage('Amount should be greater than 50 naira');
 
   const errors = req.validationErrors();
   if (errors) {
@@ -31,7 +33,7 @@ const loanValidator = (req, res, next) => {
 };
 
 /**
- * @function specificLoanValidator
+ * @function LoanIdValidator
  * @description Validates loan id
  * @param {object} req Request Object
  * @param {object} res Response Object
@@ -183,7 +185,9 @@ const repayLoanValidator = (req, res, next) => {
     .withMessage('Amount is required')
     .trim()
     .matches(/^\d+(\.\d{0,2})?$/)
-    .withMessage('Invalid amount');
+    .withMessage('Invalid amount format')
+    .custom(value => value > 0)
+    .withMessage('Amount should be greater than zero');
 
   const errors = req.validationErrors();
   if (errors) {
