@@ -13,9 +13,9 @@ const createModal = ({ error }) => {
 };
 
 const createSuccessModal = () => {
-  successModal.innerHTML = '<p>Password reset mail sent. Please check email</p>';
+  successModal.innerHTML = `<p style='color: #004600'>Password reset mail sent. Please check email</p>`;
   successModal.style.display = 'block';
-  successModal.style.backgroundColor = '#00FC18';
+  successModal.style.backgroundColor = '#7BFF59';
   setTimeout(() => {
     successModal.style.display = 'none';
   }, 5000);
