@@ -129,7 +129,15 @@ const verifyClient = async (req, res) => {
     const result = await pool.query(query);
     return res.json({
       status: 200,
-      data: result.rows[0],
+      data: {
+        id: result.rows[0].id,
+        email: result.rows[0].email,
+        firstName: result.rows[0].firstName,
+        lastName: result.rows[0].lastName,
+        status: result.rows[0].status,
+        isAdmin: result.rows[0].isAdmin,
+        createdOn: result.rows[0].createdOn,
+      },
     });
   } catch (error) {
     return res.status(500).json({

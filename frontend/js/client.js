@@ -15,7 +15,7 @@ const getUserLoans = async () => {
   const request = new Request(url, {
     method: 'GET',
     headers: {
-      'x-access-token': token,
+      Authorization: `Bearer ${token}`,
     },
     mode: 'cors',
   });
