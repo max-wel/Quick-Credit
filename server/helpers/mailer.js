@@ -1,16 +1,21 @@
-import nodemailer from 'nodemailer';
+import sgMail from '@sendgrid/mail';
 import dotenv from 'dotenv';
 import template from './templates';
 
 dotenv.config();
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.EMAIL,
-    pass: process.env.PASSWORD,
-  },
-});
+const mailer = (to, subject, content) => {
+  const message = {
+    from: process.env.EMAIL,
+    to,
+    html: content,
+    subject,
+  };
+  if (process.env.NODE_ENV !== 'test') {
+    return sgMail.send(message);
+  }
+};
 
 /**
  * @function sendResetMail
@@ -19,13 +24,10 @@ const transporter = nodemailer.createTransport({
  * @param {String} token Token
  */
 const sendResetMail = (user, token) => {
-  const mailOptions = {
-    from: 'notification@quick-credit',
-    to: user.email,
-    subject: 'Password Recovery',
-    html: template.passwordRecovery(user, token),
-  };
-  transporter.sendMail(mailOptions, (err, info) => console.log(err, info));
+  const { email } = user;
+  const subject = 'Password Recovery';
+  const content = template.passwordRecovery(user, token);
+  mailer(email, subject, content);
 };
 
 /**
@@ -35,23 +37,17 @@ const sendResetMail = (user, token) => {
  * @param {String} status Loan status
  */
 const sendLoanNotificationMail = (user, status) => {
-  const mailOptions = {
-    from: 'notification@quick-credit',
-    to: user.email,
-    subject: 'Loan Notification',
-    html: template.notification(user, status),
-  };
-  transporter.sendMail(mailOptions, (err, info) => console.log(err, info));
+  const { email } = user;
+  const subject = 'Loan Notification';
+  const content = template.notification(user, status);
+  mailer(email, subject, content);
 };
 
 const sendWelcomeMail = (user) => {
-  const mailOptions = {
-    from: 'notification@quick-credit',
-    to: user.email,
-    subject: 'Welcome to Quick-Credit',
-    html: template.welcome(user),
-  };
-  transporter.sendMail(mailOptions, (err, info) => console.log(err, info));
+  const { email } = user;
+  const subject = 'Welcome to Quick-Credit';
+  const content = template.welcome(user);
+  mailer(email, subject, content);
 };
 
 export default { sendResetMail, sendLoanNotificationMail, sendWelcomeMail };
